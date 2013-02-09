@@ -6,9 +6,9 @@
   <packaging>pom</packaging>
   <modules>
   	<module>sentry</module>
-  	<module>jarachne-recipe</module>
-  	<module>jarachne-model</module>
-  	<module>commons</module>
+  	<module>recipe</module>
+  	<module>model</module>
+  	<module>common</module>
   </modules>
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
