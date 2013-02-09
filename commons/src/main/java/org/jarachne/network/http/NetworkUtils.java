@@ -1,4 +1,4 @@
-package org.jarachne.network;
+package org.jarachne.network.http;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;

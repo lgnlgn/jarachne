@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.jarachne.network;
+package org.jarachne.network.http;
 
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 

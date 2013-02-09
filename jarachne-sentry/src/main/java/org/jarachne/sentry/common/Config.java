@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.jarachne.sentry.util.logging.ESLogger;
-import org.jarachne.sentry.util.logging.Loggers;
+import org.jarachne.util.logging.ESLogger;
+import org.jarachne.util.logging.Loggers;
+
+
 
 
 

@@ -1,8 +1,9 @@
 package org.jarachne.sentry.handler;
 
-import org.jarachne.sentry.network.Handler;
-import org.jarachne.sentry.network.NettyHttpRequest;
-import org.jarachne.sentry.util.HttpResponseUtil;
+
+import org.jarachne.network.http.Handler;
+import org.jarachne.network.http.NettyHttpRequest;
+import org.jarachne.util.HttpResponseUtil;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 
 public class HeartbeatHandler implements Handler{

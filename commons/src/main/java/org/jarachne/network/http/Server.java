@@ -1,4 +1,4 @@
-package org.jarachne.network;
+package org.jarachne.network.http;
 
 
 public interface Server {

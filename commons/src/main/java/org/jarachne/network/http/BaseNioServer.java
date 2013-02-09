@@ -1,4 +1,4 @@
-package org.jarachne.network;
+package org.jarachne.network.http;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -41,7 +41,7 @@ public abstract class BaseNioServer implements Server {
 	/**
 	 * init
 	 * 
-	 * Implement this {@link com.woyo.search.query.common.Server} method
+	 * Implement this {@link org.jarachne.network.http.woyo.search.query.common.Server} method
 	 */
 	public void init() {
 		log = Loggers.getLogger(this.serverName());
@@ -100,7 +100,7 @@ public abstract class BaseNioServer implements Server {
 	/**
 	 * start
 	 * 
-	 * Implement this {@link com.woyo.search.query.common.Server} method
+	 * Implement this {@link org.jarachne.network.http.woyo.search.query.common.Server} method
 	 */
 	public void start() {
 		this.channelFactory = this.createChannelFactory();
@@ -117,7 +117,7 @@ public abstract class BaseNioServer implements Server {
 	/**
 	 * stop
 	 * 
-	 * Implement this {@link com.woyo.search.query.common.Server} method
+	 * Implement this {@link org.jarachne.network.http.woyo.search.query.common.Server} method
 	 */
 	public void stop() {
 		ChannelGroupFuture closeFuture = allChannels.close();

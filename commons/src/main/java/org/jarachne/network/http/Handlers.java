@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jarachne.sentry.network;
+package org.jarachne.network.http;
 
 import java.util.Map;
 
