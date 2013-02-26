@@ -5,6 +5,7 @@
 
 package org.jarachne.network.http;
 
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 
 /**
@@ -14,6 +15,6 @@ public interface Handler {
 
 	 public String getPath();
 	 
-	 public void handle(NettyHttpRequest req,DefaultHttpResponse resp);
+	 public DefaultHttpResponse handle(MessageEvent me);
 	 
 }

@@ -228,7 +228,7 @@ public class Strings {
 	
 	public static final void arrayToAppend(StringBuilder sb, String name,
 			Object[] os) {
-		sb.append( String.format(",\"%s\"", name)).append(":");
+		sb.append( String.format("\"%s\"", name)).append(":");
 		if (os == null) {
 			sb.append(" null \n");
 			return;

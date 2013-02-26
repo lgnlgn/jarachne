@@ -1,4 +1,4 @@
-package org.jarachne.util;
+package org.jarachne.network.http;
 
 import java.nio.charset.Charset;
 
