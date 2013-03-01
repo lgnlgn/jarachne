@@ -5,12 +5,12 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-  	<module>sentry</module>
-  	<module>recipe</module>
-  	<module>model</module>
-  	<module>common</module>
+  	<module>jarachne-sentry</module>
+  	<module>jarachne-recipe</module>
+  	<module>jarachne-common</module>
   </modules>
-  <properties>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java-version>1.6</java-version>
+    </properties>
 </project>
