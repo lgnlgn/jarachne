@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,4 +264,23 @@ public class Strings {
 		return result;
 	}
 	
+	
+	@SuppressWarnings("rawtypes")
+	public static String display(Collection iterable){
+		if (iterable == null){
+			return null;
+		}
+		if (iterable.isEmpty()){
+			return "[]";
+		}
+		StringBuilder builder = new StringBuilder("[");
+		for(Object obj : iterable){
+			if (obj instanceof String){
+				builder.append("\"" + obj + "\", ");
+			}else{
+				builder.append( obj + ", ");
+			}
+		}
+		return builder.substring(0, builder.length() - 2) +"]";
+	}
 }

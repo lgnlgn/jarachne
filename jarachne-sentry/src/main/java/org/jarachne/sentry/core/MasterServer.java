@@ -1,6 +1,6 @@
 package org.jarachne.sentry.core;
 
-import io.netty.handler.codec.http.HttpChunkAggregator;
+
 
 
 
@@ -8,8 +8,7 @@ import org.jarachne.network.http.BaseChannelHandler;
 import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
-import org.jarachne.sentry.handler.master.AdminRequestHandler;
-import org.jarachne.sentry.handler.slave.FileSaveRequestHandler;
+
 
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -75,8 +74,7 @@ public class MasterServer extends BaseNioServer{
 	
 	public static void main(String[] args) {
 		MasterServer mserver = new MasterServer();
-		mserver.addReqHandler(new FileSaveRequestHandler());
-		mserver.addReqHandler(new AdminRequestHandler());
+//		mserver.addReqHandler(new AdminRequestHandler());
 		mserver.start();
 	}
 }
