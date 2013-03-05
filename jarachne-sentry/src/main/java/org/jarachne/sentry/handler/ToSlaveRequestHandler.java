@@ -1,15 +1,34 @@
 package org.jarachne.sentry.handler;
 
-
-
-
-public class ToSlaveRequestHandler implements RequestHandler{
-
-	public String reqUri;
-	public AbstractDistributedChannelHandler handler;
+public abstract class ToSlaveRequestHandler implements RequestHandler{
+	String uri;
+	AbstractDistributedChannelHandler channelHandler;
 	
-	public String getPath() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	
+	public String getUri() {
+		return uri;
 	}
+
+
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
+
+
+	public AbstractDistributedChannelHandler getChannelHandler() {
+		return channelHandler;
+	}
+
+
+
+	public void setChannel(AbstractDistributedChannelHandler channel) {
+		this.channelHandler = channel;
+	}
+
+
+
+	abstract public String getPath() ;
 }

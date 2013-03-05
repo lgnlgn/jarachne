@@ -60,13 +60,17 @@ public class MasterModule {
 		return a;
 	}
 	
-	
 	public String requestSlaves(ToSlaveRequestHandler tsReq){
+		return this.requestSlaves(tsReq, 2000);
+	}
+	
+	
+	public String requestSlaves(ToSlaveRequestHandler tsReq, long soTimeOut){
 		if (slaves.isEmpty()){
 			return "";
 		}
 		List<String> slaves = yieldSlaves();
-		final AbstractDistributedChannelHandler channelHandler = tsReq.handler.clone(slaves);
+		final AbstractDistributedChannelHandler channelHandler = tsReq.getChannelHandler().clone(slaves);
 		
 		
 		client.setPipelineFactory(new ChannelPipelineFactory()
@@ -93,18 +97,18 @@ public class MasterModule {
 			
 		}
 		for(ChannelFuture cf : channelFutrueList){
-			if (!cf.awaitUninterruptibly(1000)){
+			if (!cf.awaitUninterruptibly(500)){
 				return "!bad connection";
 			}
 		}
 		for(ChannelFuture cf : channelFutrueList){
-			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.reqUri);
+			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.getUri());
 			cf.getChannel().write(req);
 		}
 		for(ChannelFuture cf : channelFutrueList){
-			cf.awaitUninterruptibly(1000);
+			cf.awaitUninterruptibly(soTimeOut);
 		}
-		return tsReq.handler.processResult();	
+		return tsReq.getChannelHandler().processResult();	
 	}
 	
 }
