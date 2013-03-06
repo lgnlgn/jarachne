@@ -1,16 +1,15 @@
-package org.jarachne.sentry.master.handler;
+package org.jarachne.sentry.slave.handler;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.zookeeper.KeeperException;
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
-import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.sentry.handler.LocalRequestHandler;
 import org.jarachne.sentry.handler.RequestHandler;
-import org.jarachne.sentry.master.MasterModule;
+import org.jarachne.sentry.master.handler.MasterChannelHandler;
+import org.jarachne.sentry.slave.SlaveModule;
 import org.jarachne.util.Strings;
 import org.jarachne.util.logging.ESLogger;
 import org.jarachne.util.logging.Loggers;
@@ -27,23 +26,18 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
-public class MasterChannelHandler extends SimpleChannelHandler{
-
+public class SlaveChannelHandler extends SimpleChannelHandler {
 	static ESLogger log = Loggers.getLogger(MasterChannelHandler.class);
 	
 	Map<String, RequestHandler> handlers;
-	MasterModule module ; //
-	
-	
-	public MasterChannelHandler(MasterModule module, Map<String, RequestHandler> handlers ) throws KeeperException, InterruptedException{
+	SlaveModule module ; //
+
+	public SlaveChannelHandler(Map<String, RequestHandler> handlers){
 		this.handlers = handlers;
-		this.module = module;
-		
 	}
 	
-	public MasterChannelHandler(MasterModule module, RequestHandler... handlers){
+	public SlaveChannelHandler(RequestHandler... handlers){
 		this.handlers = new ConcurrentHashMap<String, RequestHandler>();
-		this.module = module;
 		this.addRequestHandlers(handlers);
 	}
 	
@@ -64,14 +58,15 @@ public class MasterChannelHandler extends SimpleChannelHandler{
 		DefaultHttpResponse resp = new DefaultHttpResponse(req.getProtocolVersion(), HttpResponseStatus.OK);
 		if (handler == null){
 			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, 
-					"path not found! current_path : " + this.handlers.keySet());
+					"path not found! current path : " + Strings.display(this.handlers.keySet()));
 		}else if (handler instanceof LocalRequestHandler){
 			((LocalRequestHandler) handler).handle(nhr, resp);
-		}else if (handler instanceof AbstractDistributedChannelHandler){
-			//TODO further check
-			String result = module.requestSlaves((AbstractDistributedChannelHandler) handler);
-			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.OK, result);
 		}
+//		else if (handler instanceof AbstractDistributedChannelHandler){
+//			//TODO further check
+//			String result = module.requestSlaves((ToSlaveRequestHandler) handler);
+//			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.OK, result);
+//		}
 		
 		resp.setHeader(HttpHeaders.Names.CONTENT_TYPE, Strings.CONTENT_TYPE);
 		resp.setHeader("Content-Length", resp.getContent().readableBytes());
@@ -103,7 +98,4 @@ public class MasterChannelHandler extends SimpleChannelHandler{
 		
 		log.info( "{} \"{}\" {}", ip, url, responeContent );
 	}
-	
-
-	
 }

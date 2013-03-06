@@ -3,11 +3,17 @@ package org.jarachne.sentry.handler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.jarachne.network.http.NettyHttpRequest;
+import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.jboss.netty.handler.codec.http.HttpMessage;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponse;
 
 /**
  * channel for distributed requests
@@ -16,15 +22,25 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
  */
 public abstract class AbstractDistributedChannelHandler extends SimpleChannelUpstreamHandler implements RequestHandler{
 
-	Collection<String> slaves;
+	protected Collection<String> slaves;
+	protected Map<String, String> collectedResults;
+
 	
-	public AbstractDistributedChannelHandler(){
-		this.slaves = new ArrayList<String>();
-	}
+	/**
+	 * uri path sent request to slaves
+	 * <p> need to be the same to the slave.getPath()</p>
+	 * @return
+	 */
+	abstract public String requestSlaveUri();
 	
 	abstract public String processResult();
 	
-	abstract public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception;
+	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)throws Exception {
+		HttpMessage message = (HttpMessage)e.getMessage();
+		String remoteAddress = e.getRemoteAddress().toString();
+		this.collectedResults.put(remoteAddress, new String(message.getContent().array()));
+		e.getFuture().addListener(ChannelFutureListener.CLOSE);
+	}
 	
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception{
 		e.getChannel().close();

@@ -8,5 +8,13 @@ package org.jarachne.sentry.handler;
  *
  */
 public interface RequestHandler {
+	
+	/**
+	 * <p>path for processing local data</p>
+	 * <p>path for distributed requests URI</p> 
+	 * so we MUST have <b>path of distributed_requester</b> = <b>path of task executor</b>
+	 * <p></p>
+	 * @return
+	 */
 	public String getPath();
 }

@@ -1,20 +1,27 @@
-package org.jarachne.sentry.master.handler.local;
+package org.jarachne.sentry.slave.handler.local;
 
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
 import org.jarachne.sentry.handler.LocalRequestHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
-public class DataDisplayHandler implements LocalRequestHandler{
+/**
+ * correspond to {@link #DataCollectHandler} in master
+ * 
+ * @author lgn-mop
+ *
+ */
+public class DataReportHandler implements LocalRequestHandler{
+
 
 	public String getPath() {
-		// TODO Auto-generated method stub
-		return "/local/data";
+		return "/data";
 	}
 
 	public void handle(NettyHttpRequest request, DefaultHttpResponse resp) {
 		// TODO Auto-generated method stub
-		HttpResponseUtil.setHttpResponseOkReturn(resp, "{}");
+		HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.OK, "no data");
 	}
-
+	
 }

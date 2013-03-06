@@ -1,21 +1,14 @@
 package org.jarachne.sentry.core;
 
-
-
-
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.zookeeper.KeeperException;
-import org.jarachne.common.Constants;
 import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.sentry.handler.RequestHandler;
-import org.jarachne.sentry.master.MasterModule;
-import org.jarachne.sentry.master.handler.MasterChannelHandler;
-import org.jarachne.sentry.master.handler.distributed.DataCollectHandler;
-import org.jarachne.sentry.master.handler.local.DataDisplayHandler;
-import org.jarachne.util.ZKClient;
+import org.jarachne.sentry.slave.SlaveModule;
+import org.jarachne.sentry.slave.handler.SlaveChannelHandler;
+import org.jarachne.sentry.slave.handler.local.DataReportHandler;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -24,33 +17,25 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
-
-public class MasterServer extends BaseNioServer{
-
-
+public class SlaveServer extends BaseNioServer{
 	Map<String, RequestHandler> handlers = new ConcurrentHashMap<String, RequestHandler>();
-	final MasterChannelHandler channel ;
+	final SlaveChannelHandler channel;
+	
+	public SlaveServer(SlaveModule module)throws KeeperException, InterruptedException{
+		super();
+		channel = new SlaveChannelHandler(handlers);
+		log = Loggers.getLogger(SlaveServer.class);
+	}
+	
 	
 	public String serverName() {
-		// TODO Auto-generated method stub
-		return "jarachne.master";
+		return "jarachne.slave";
 	}
 
 	@Override
 	protected ChannelUpstreamHandler finalChannelUpstreamHandler() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	public MasterServer(MasterModule module) throws KeeperException, InterruptedException{
-		super();
-		channel = new MasterChannelHandler(module, handlers);
-		log = Loggers.getLogger(MasterServer.class);
-	}
-	
-	protected int defaultPort()
-	{
-		return 24111;
 	}
 	
 	protected ChannelPipelineFactory getChannelPipelineFactory(){
@@ -73,16 +58,20 @@ public class MasterServer extends BaseNioServer{
 		};
 	}
 	
+	protected int defaultPort()
+	{
+		return 25111;
+	}
+	
 	public void addReqHandler(RequestHandler... handlers){
 		this.channel.addRequestHandlers(handlers);
 	}
 	
 	public static void main(String[] args) throws KeeperException, InterruptedException {
-		MasterModule module = new MasterModule();
-		MasterServer mserver = new MasterServer(module);
-		ZKClient.get().setData(Constants.ZK_MASTER_PATH, mserver.getServerAddress().getBytes());
-		mserver.addReqHandler(new DataDisplayHandler());
-		mserver.addReqHandler(new DataCollectHandler());
-		mserver.start();
+		SlaveModule module = new SlaveModule();
+		SlaveServer server = new SlaveServer(module);
+		module.register(server.getServerAddress());
+		server.addReqHandler(new DataReportHandler());
+		server.start();
 	}
 }

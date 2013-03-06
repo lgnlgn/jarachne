@@ -10,8 +10,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
+import org.apache.zookeeper.KeeperException;
+import org.jarachne.common.Constants;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
-import org.jarachne.sentry.handler.ToSlaveRequestHandler;
+import org.jarachne.util.ZKClient;
+import org.jarachne.util.ZKClient.ChildrenWatcher;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -29,17 +32,22 @@ public class MasterModule {
 
 	public ClientBootstrap client;
 	
-	public MasterModule(){
+	private ChildrenWatcher cw;
+	
+	public MasterModule() throws KeeperException, InterruptedException{
 		slaves = new ConcurrentHashMap<String, String>();
 		client = new ClientBootstrap(
 				new NioClientSocketChannelFactory(
 						Executors.newCachedThreadPool(),
 						Executors.newCachedThreadPool()));
+		ZKClient.get().createIfNotExist(Constants.ZK_MASTER_PATH);
+		ZKClient.get().createIfNotExist(Constants.ZK_SLAVE_PATH);
+		this.watchZookeeper();
 	}
 
 	
 	public void addSlave(String hostPort){
-		slaves.put(hostPort, null);
+		this.slaves.put(hostPort, "");
 	}
 	
 	public String removeSlave(String hostPort){
@@ -54,24 +62,43 @@ public class MasterModule {
 		return slaves;
 	}
 	
+
+	public void watchZookeeper(){
+		cw = new ChildrenWatcher() {
+			@Override
+			public void nodeRemoved(String node) {
+				removeSlave(node);
+				
+			}
+			@Override
+			public void nodeAdded(String node) {
+				addSlave(node);
+				System.out.println(slaves);
+			}
+		};
+		ZKClient.get().watchChildren(Constants.ZK_SLAVE_PATH, cw);
+	}
+	
+	
+	
 	public List<String> yieldSlaves(){
 		List<String> a = new ArrayList<String>();
 		a.addAll(this.slaves.keySet());
 		return a;
 	}
 	
-	public String requestSlaves(ToSlaveRequestHandler tsReq){
+	public String requestSlaves(AbstractDistributedChannelHandler tsReq){
 		return this.requestSlaves(tsReq, 2000);
 	}
 	
 	
-	public String requestSlaves(ToSlaveRequestHandler tsReq, long soTimeOut){
+	public String requestSlaves(AbstractDistributedChannelHandler tsReq, long soTimeOut){
 		if (slaves.isEmpty()){
 			return "";
 		}
 		List<String> slaves = yieldSlaves();
-		final AbstractDistributedChannelHandler channelHandler = tsReq.getChannelHandler().clone(slaves);
-		
+		final AbstractDistributedChannelHandler channelHandler = tsReq.clone(slaves);
+		System.out.println("sending");
 		
 		client.setPipelineFactory(new ChannelPipelineFactory()
 		{
@@ -102,13 +129,13 @@ public class MasterModule {
 			}
 		}
 		for(ChannelFuture cf : channelFutrueList){
-			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.getUri());
+			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.requestSlaveUri());
 			cf.getChannel().write(req);
 		}
 		for(ChannelFuture cf : channelFutrueList){
 			cf.awaitUninterruptibly(soTimeOut);
 		}
-		return tsReq.getChannelHandler().processResult();	
+		return channelHandler.processResult();	
 	}
 	
 }
