@@ -7,20 +7,28 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.zookeeper.KeeperException;
 import org.jarachne.common.Constants;
+import org.jarachne.common.HttpRequestCallable;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.util.ZKClient;
 import org.jarachne.util.ZKClient.ChildrenWatcher;
+import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
@@ -30,16 +38,17 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 public class MasterModule {
 	private volatile Map<String, String> slaves;
 
-	public ClientBootstrap client;
-	
+	public ClientBootstrap bootstrap;
+	private HttpClient httpClient;
 	private ChildrenWatcher cw;
 	
 	public MasterModule() throws KeeperException, InterruptedException{
 		slaves = new ConcurrentHashMap<String, String>();
-		client = new ClientBootstrap(
+		bootstrap = new ClientBootstrap(
 				new NioClientSocketChannelFactory(
 						Executors.newCachedThreadPool(),
 						Executors.newCachedThreadPool()));
+		httpClient = new DefaultHttpClient();
 		ZKClient.get().createIfNotExist(Constants.ZK_MASTER_PATH);
 		ZKClient.get().createIfNotExist(Constants.ZK_SLAVE_PATH);
 		this.watchZookeeper();
@@ -87,12 +96,45 @@ public class MasterModule {
 		return a;
 	}
 	
-	public String requestSlaves(AbstractDistributedChannelHandler tsReq){
-		return this.requestSlaves(tsReq, 2000);
+	public String requestSlaves(AbstractDistributedChannelHandler tsReq) throws InterruptedException, ExecutionException{
+//		return this.requestSlaves(tsReq, 2000);
+		List<String> slaves = yieldSlaves();
+		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
+		for(String slaveAddr: slaves){
+			distributedReqs.add(new HttpRequestCallable(httpClient, "http://" + slaveAddr + tsReq.requestSlaveUri()));
+		}
+		
+		List<String> results = ConcurrentExecutor.execute(distributedReqs);
+		return results.toString();
 	}
 	
 	
-	public String requestSlaves(AbstractDistributedChannelHandler tsReq, long soTimeOut){
+	
+	private static boolean waitFutures(List<ChannelFuture> cfs, long timeOut) throws InterruptedException{
+		int i = 0 ;
+		long t = System.currentTimeMillis();
+		while(true){
+			for(ChannelFuture cf : cfs){
+				if (cf.isDone()){
+					i += 1;
+				}
+			}
+			if (i == cfs.size())
+				return true;
+			else {
+				i = 0;
+			}
+			long t2 = System.currentTimeMillis() -t;
+			if (t2 > timeOut)
+				return false;
+			Thread.sleep(10);
+		}
+	}
+	
+	
+	
+	
+	public String requestSlaves(AbstractDistributedChannelHandler tsReq, long soTimeOut) throws InterruptedException{
 		if (slaves.isEmpty()){
 			return "";
 		}
@@ -100,7 +142,7 @@ public class MasterModule {
 		final AbstractDistributedChannelHandler channelHandler = tsReq.clone(slaves);
 		System.out.println("sending");
 		
-		client.setPipelineFactory(new ChannelPipelineFactory()
+		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
 		{
 
 			public ChannelPipeline getPipeline() throws Exception
@@ -119,22 +161,33 @@ public class MasterModule {
 		ArrayList<ChannelFuture> channelFutrueList = new ArrayList<ChannelFuture>(slaves.size());
 		for(String slaveAddress : slaves){
 			int idx = slaveAddress.indexOf(':');
-			ChannelFuture future = client.connect(new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1))));
+			ChannelFuture future = bootstrap.connect(new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1))));
 			channelFutrueList.add(future);
 			
 		}
+		boolean ok;
 		for(ChannelFuture cf : channelFutrueList){
-			if (!cf.awaitUninterruptibly(500)){
-				return "!bad connection";
-			}
+			ok = cf.awaitUninterruptibly(1000);
+			if (!ok)
+				throw new RuntimeException("---!!!!!!!!!!---------");
 		}
+
+		ArrayList<ChannelFuture> reqCF = new ArrayList<ChannelFuture>();
+
 		for(ChannelFuture cf : channelFutrueList){
 			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.requestSlaveUri());
-			cf.getChannel().write(req);
+			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
+			Channel ch = cf.getChannel();
+			reqCF.add(ch.write(req));
+
 		}
-		for(ChannelFuture cf : channelFutrueList){
-			cf.awaitUninterruptibly(soTimeOut);
+		for(ChannelFuture cf : reqCF){
+			ok = cf.awaitUninterruptibly(1000);
+			if (!ok)
+				throw new RuntimeException("---!!!!!!!!!!---------");
 		}
+
 		return channelHandler.processResult();	
 	}
 	

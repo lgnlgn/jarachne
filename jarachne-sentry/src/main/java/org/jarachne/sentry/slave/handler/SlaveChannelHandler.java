@@ -58,7 +58,7 @@ public class SlaveChannelHandler extends SimpleChannelHandler {
 		DefaultHttpResponse resp = new DefaultHttpResponse(req.getProtocolVersion(), HttpResponseStatus.OK);
 		if (handler == null){
 			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, 
-					"path not found! current path : " + Strings.display(this.handlers.keySet()));
+					"path not found! current path : " + this.handlers.keySet());
 		}else if (handler instanceof LocalRequestHandler){
 			((LocalRequestHandler) handler).handle(nhr, resp);
 		}

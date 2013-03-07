@@ -22,6 +22,7 @@ public class DataReportHandler implements LocalRequestHandler{
 	public void handle(NettyHttpRequest request, DefaultHttpResponse resp) {
 		// TODO Auto-generated method stub
 		HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.OK, "no data");
+		
 	}
 	
 }

@@ -39,7 +39,8 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 		HttpMessage message = (HttpMessage)e.getMessage();
 		String remoteAddress = e.getRemoteAddress().toString();
 		this.collectedResults.put(remoteAddress, new String(message.getContent().array()));
-		e.getFuture().addListener(ChannelFutureListener.CLOSE);
+//		e.getFuture().addListener(ChannelFutureListener.CLOSE);
+
 	}
 	
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception{

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
 import org.jarachne.sentry.handler.LocalRequestHandler;
@@ -24,6 +27,7 @@ public class StatusHandler implements LocalRequestHandler{
 	}
 
 	public void handle(NettyHttpRequest request, DefaultHttpResponse resp) {
+		JSONObject json = new JSONObject();
 		HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.OK, "hi");
 	}
 
