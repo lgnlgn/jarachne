@@ -4,18 +4,16 @@ package org.jarachne.sentry.core;
 
 
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.zookeeper.KeeperException;
 import org.jarachne.common.Constants;
+import org.jarachne.network.http.BaseChannelHandler;
 import org.jarachne.network.http.BaseNioServer;
-import org.jarachne.sentry.handler.RequestHandler;
+import org.jarachne.network.http.Handler;
+import org.jarachne.network.http.Handlers;
 import org.jarachne.sentry.master.MasterModule;
-import org.jarachne.sentry.master.handler.MasterChannelHandler;
-import org.jarachne.sentry.master.handler.distributed.DataCollectHandler;
+import org.jarachne.sentry.master.handler.local.DataCollectHandler;
 import org.jarachne.sentry.master.handler.local.DataDisplayHandler;
-import org.jarachne.util.ZKClient;
+import org.jarachne.sentry.master.handler.local.StatusHandler;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -27,9 +25,8 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
 public class MasterServer extends BaseNioServer{
 
-
-	Map<String, RequestHandler> handlers = new ConcurrentHashMap<String, RequestHandler>();
-	final MasterChannelHandler channel ;
+	Handlers handlers = new Handlers();
+	final BaseChannelHandler channel = new BaseChannelHandler(handlers);
 	
 	public String serverName() {
 		// TODO Auto-generated method stub
@@ -42,9 +39,8 @@ public class MasterServer extends BaseNioServer{
 		return null;
 	}
 	
-	public MasterServer(MasterModule module) throws KeeperException, InterruptedException{
+	public MasterServer() throws KeeperException, InterruptedException{
 		super();
-		channel = new MasterChannelHandler(module, handlers);
 		log = Loggers.getLogger(MasterServer.class);
 	}
 	
@@ -52,6 +48,11 @@ public class MasterServer extends BaseNioServer{
 	{
 		return 24111;
 	}
+	
+	public void addHandler(Handler... hander){
+		this.handlers.addHandler(hander);
+	}
+	
 	
 	protected ChannelPipelineFactory getChannelPipelineFactory(){
 		return new ChannelPipelineFactory(){
@@ -73,16 +74,14 @@ public class MasterServer extends BaseNioServer{
 		};
 	}
 	
-	public void addReqHandler(RequestHandler... handlers){
-		this.channel.addRequestHandlers(handlers);
-	}
 	
-	public static void main(String[] args) throws KeeperException, InterruptedException {
+	public static void main(String[] args) throws Exception {
 		MasterModule module = new MasterModule();
-		MasterServer mserver = new MasterServer(module);
-		ZKClient.get().setData(Constants.ZK_MASTER_PATH, mserver.getServerAddress().getBytes());
-		mserver.addReqHandler(new DataDisplayHandler());
-		mserver.addReqHandler(new DataCollectHandler());
+		MasterServer mserver = new MasterServer();
+		mserver.addHandler(new DataDisplayHandler(module));
+		mserver.addHandler(new DataCollectHandler(module));
+		mserver.addHandler(new StatusHandler(module));
 		mserver.start();
+		module.register(Constants.ZK_MASTER_PATH, mserver.getServerAddress());
 	}
 }

@@ -15,6 +15,6 @@ public interface Handler {
 
 	 public String getPath();
 	 
-	 public DefaultHttpResponse handle(MessageEvent me);
+	 public void handle(NettyHttpRequest req, DefaultHttpResponse resp);
 	 
 }

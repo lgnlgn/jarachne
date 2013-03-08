@@ -57,4 +57,12 @@ public class HttpResponseUtil {
 		resp.setStatus( HttpResponseStatus.OK );
 		resp.setContent(ChannelBuffers.copiedBuffer( content));
 	}
+	
+	public static void setResponse( DefaultHttpResponse resp, String respHead, String respBody){
+		resp.setStatus( HttpResponseStatus.OK );
+		StringBuilder builder = new StringBuilder();
+		builder.append("{ \"reqest\": \"" + respHead + "\", \"respone\":" ).append(respBody).append("}");
+		
+		resp.setContent(ChannelBuffers.copiedBuffer( builder.toString().getBytes()));
+	}
 }

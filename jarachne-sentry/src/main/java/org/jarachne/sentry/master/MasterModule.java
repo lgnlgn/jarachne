@@ -15,8 +15,10 @@ import java.util.concurrent.Executors;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.zookeeper.KeeperException;
+import org.jarachne.common.Config;
 import org.jarachne.common.Constants;
 import org.jarachne.common.HttpRequestCallable;
+import org.jarachne.sentry.core.Module;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.util.ZKClient;
 import org.jarachne.util.ZKClient.ChildrenWatcher;
@@ -35,20 +37,21 @@ import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
-public class MasterModule {
+public class MasterModule extends Module{
 	private volatile Map<String, String> slaves;
-
+	private String dataDir;
 	public ClientBootstrap bootstrap;
-	private HttpClient httpClient;
+//	private HttpClient httpClient;
 	private ChildrenWatcher cw;
 	
 	public MasterModule() throws KeeperException, InterruptedException{
 		slaves = new ConcurrentHashMap<String, String>();
+		dataDir = Config.get().get("dataDir", "./data");
 		bootstrap = new ClientBootstrap(
 				new NioClientSocketChannelFactory(
 						Executors.newCachedThreadPool(),
 						Executors.newCachedThreadPool()));
-		httpClient = new DefaultHttpClient();
+//		httpClient = new DefaultHttpClient();
 		ZKClient.get().createIfNotExist(Constants.ZK_MASTER_PATH);
 		ZKClient.get().createIfNotExist(Constants.ZK_SLAVE_PATH);
 		this.watchZookeeper();
@@ -61,6 +64,10 @@ public class MasterModule {
 	
 	public String removeSlave(String hostPort){
 		return this.slaves.remove(hostPort);
+	}
+	
+	public String getDataDir(){
+		return this.dataDir;
 	}
 	
 	public Map<String, String> copySlave(){
@@ -82,7 +89,7 @@ public class MasterModule {
 			@Override
 			public void nodeAdded(String node) {
 				addSlave(node);
-				System.out.println(slaves);
+//				System.out.println(slaves);
 			}
 		};
 		ZKClient.get().watchChildren(Constants.ZK_SLAVE_PATH, cw);
@@ -97,15 +104,14 @@ public class MasterModule {
 	}
 	
 	public String requestSlaves(AbstractDistributedChannelHandler tsReq) throws InterruptedException, ExecutionException{
-//		return this.requestSlaves(tsReq, 2000);
-		List<String> slaves = yieldSlaves();
-		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
-		for(String slaveAddr: slaves){
-			distributedReqs.add(new HttpRequestCallable(httpClient, "http://" + slaveAddr + tsReq.requestSlaveUri()));
-		}
-		
-		List<String> results = ConcurrentExecutor.execute(distributedReqs);
-		return results.toString();
+		return this.requestSlaves(tsReq, 2000);
+//		List<String> slaves = yieldSlaves();
+//		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
+//		for(String slaveAddr: slaves){
+//			distributedReqs.add(new HttpRequestCallable(httpClient, "http://" + slaveAddr + tsReq.requestSlaveUri()));
+//		}
+//		List<String> results = ConcurrentExecutor.execute(distributedReqs);
+//		return results.toString();
 	}
 	
 	
@@ -140,7 +146,7 @@ public class MasterModule {
 		}
 		List<String> slaves = yieldSlaves();
 		final AbstractDistributedChannelHandler channelHandler = tsReq.clone(slaves);
-		System.out.println("sending");
+		
 		
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
 		{
@@ -161,16 +167,12 @@ public class MasterModule {
 		ArrayList<ChannelFuture> channelFutrueList = new ArrayList<ChannelFuture>(slaves.size());
 		for(String slaveAddress : slaves){
 			int idx = slaveAddress.indexOf(':');
-			ChannelFuture future = bootstrap.connect(new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1))));
+			InetSocketAddress  isa = new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1)));
+			ChannelFuture future = bootstrap.connect(isa);
 			channelFutrueList.add(future);
 			
 		}
-		boolean ok;
-		for(ChannelFuture cf : channelFutrueList){
-			ok = cf.awaitUninterruptibly(1000);
-			if (!ok)
-				throw new RuntimeException("---!!!!!!!!!!---------");
-		}
+		waitFutures(channelFutrueList, 1000);
 
 		ArrayList<ChannelFuture> reqCF = new ArrayList<ChannelFuture>();
 
@@ -182,13 +184,9 @@ public class MasterModule {
 			reqCF.add(ch.write(req));
 
 		}
-		for(ChannelFuture cf : reqCF){
-			ok = cf.awaitUninterruptibly(1000);
-			if (!ok)
-				throw new RuntimeException("---!!!!!!!!!!---------");
-		}
-
+		waitFutures(reqCF, 1000);
 		return channelHandler.processResult();	
 	}
+
 	
 }

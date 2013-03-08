@@ -16,25 +16,17 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
-public class DataCollectHandler extends AbstractDistributedChannelHandler{
+public class DataCollectChannelHandler extends AbstractDistributedChannelHandler{
 	
-	public DataCollectHandler() {
+	public DataCollectChannelHandler() {
 		this.slaves = new ArrayList<String>();
 		this.collectedResults = new ConcurrentHashMap<String, String>();
 		
 	}
 
 	@Override
-	public String processResult() {
-		return this.collectedResults.toString();
-	}
-
-
-
-
-	@Override
 	public AbstractDistributedChannelHandler clone(Collection<String> currentSlaves) {
-		DataCollectHandler ch = new DataCollectHandler();
+		DataCollectChannelHandler ch = new DataCollectChannelHandler();
 		ch.slaves.addAll(currentSlaves);
 		return ch;
 	}

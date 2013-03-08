@@ -1,20 +1,25 @@
 package org.jarachne.sentry.handler;
 
+import org.jarachne.network.http.Handler;
+import org.jarachne.network.http.NettyHttpRequest;
+import org.jarachne.sentry.core.Module;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+
 /**
- * two kinds of handler: 
- * 1. channel handler for asynchronize distributed requests
- * 2. handle methods for #messageRecieced
+ * handler #HttpRequest
  * @author lgn-mop
  *
  */
-public interface RequestHandler {
+public abstract class RequestHandler implements Handler{
 	
+	protected Module module;
 	/**
-	 * <p>path for processing local data</p>
-	 * <p>path for distributed requests URI</p> 
-	 * so we MUST have <b>path of distributed_requester</b> = <b>path of task executor</b>
-	 * <p></p>
-	 * @return
+	 *  for distributed request
 	 */
-	public String getPath();
+	protected AbstractDistributedChannelHandler channel;
+	
+	public RequestHandler(Module module, AbstractDistributedChannelHandler channel){
+		this.module = module;
+		this.channel = channel;
+	}
 }

@@ -32,55 +32,41 @@ public class BaseChannelHandler extends SimpleChannelHandler {
 
 	protected Handlers handlers ;
 
-	
 	public BaseChannelHandler( Handlers handlers ) {
-
 		this.handlers = handlers;
 	}
 
 	
-	
-	public void messageReceived(ChannelHandlerContext ctx, final MessageEvent me)
+	public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
 			throws Exception {
-		
 		// common http request
-		if (me.getMessage() instanceof HttpRequest){
-			
-			final HttpRequest request = (HttpRequest) me.getMessage();
-			String uri = request.getUri();
-			
-			String path = uri.split("/")[2];
-			Handler h = handlers.getRequestHandler(path);
-			if (h != null){
-				DefaultHttpResponse resp = h.handle(me);
-				
-				resp.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
-				resp.setHeader("Content-Length", resp.getContent().readableBytes());
+		HttpRequest req = (HttpRequest)e.getMessage();
+		NettyHttpRequest nhr = new NettyHttpRequest(req);
+		String path = nhr.path();
 
-				boolean close = !HttpHeaders.isKeepAlive(request);
-
-				resp.setHeader(HttpHeaders.Names.CONNECTION,
-						close ? HttpHeaders.Values.CLOSE
-								: HttpHeaders.Values.KEEP_ALIVE);
-				
-				ChannelFuture cf = me.getChannel().write(resp);
-
-				if (close) 
-					cf.addListener(ChannelFutureListener.CLOSE);
-				writeAccessLog(me.getChannel(), request, resp);
-			}
-			
+		Handler handler = handlers.getHandler(path);
+		DefaultHttpResponse resp = new DefaultHttpResponse(req.getProtocolVersion(), HttpResponseStatus.OK);
+		if (handler == null){
+			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, 
+					"path not found! current_path : " + this.handlers.handlers.keySet());
 		}else{
-			
-			final HttpResponse response = (HttpResponse) me.getMessage();
-			String path = response.getHeader("path");
-			Handler h = handlers.getResponseHandler(path);
-			if (h != null){
-				h.handle(me);
-			}
-			// no need further reply 
+			handler.handle(nhr, resp);
 		}
+		
+		resp.setHeader(HttpHeaders.Names.CONTENT_TYPE, Strings.CONTENT_TYPE);
+		resp.setHeader("Content-Length", resp.getContent().readableBytes());
 
+		boolean close = !HttpHeaders.isKeepAlive(req);
+
+		resp.setHeader(HttpHeaders.Names.CONNECTION,
+				close ? HttpHeaders.Values.CLOSE
+						: HttpHeaders.Values.KEEP_ALIVE);
+		
+		ChannelFuture cf = e.getChannel().write(resp);
+
+		if (close) 
+			cf.addListener(ChannelFutureListener.CLOSE);
+		writeAccessLog(e.getChannel(), req, resp);
 	
 	}
 
@@ -90,7 +76,6 @@ public class BaseChannelHandler extends SimpleChannelHandler {
 
 //		if (log.isTraceEnabled())
 //			log.trace("Connection exceptionCaught:{}", e.getCause().toString());
-
 		e.getChannel().close();
 	}
 	

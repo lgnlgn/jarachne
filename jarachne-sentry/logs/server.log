@@ -1,0 +1,214 @@
+2013-03-08 11:41:56,859 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:41:57,101 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:41:57,102 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:41:57,397 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:45:51,890 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:45:52,013 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:45:52,013 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:45:52,329 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 11:46:10,204 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:57548 "/aaa" {"message":"400 Bad Request", "reason":"path not found! current_path : [/data, /local/data]"}
+2013-03-08 11:47:05,758 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:47:05,889 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:47:05,890 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:47:06,249 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:47:37,014 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:57736 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:47:45,724 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:57695 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 11:48:37,527 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:48:37,659 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:48:37,659 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:48:37,940 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:50:23,472 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:50:23,593 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:50:23,593 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:50:23,860 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:50:25,852 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:50:25,972 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:50:25,973 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:50:26,250 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 11:50:28,835 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58110 "/data" 
+2013-03-08 11:50:29,696 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58110 "/data" 
+2013-03-08 11:51:50,516 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:51,280 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:51,738 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:51,936 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:52,090 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:52,258 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:52,398 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58278 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:51:57,936 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58110 "/data" 
+2013-03-08 11:52:22,717 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58110 "/data" 
+2013-03-08 11:52:35,840 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:52:35,960 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:52:35,960 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:52:36,228 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:53:33,043 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:53:33,220 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:53:33,221 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:53:33,565 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:55:37,248 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:55:37,484 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:55:37,484 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:55:37,801 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:55:50,529 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58737 "/local/data" { "reqest": "data on master server", "respone":{"dataList":[]}}
+2013-03-08 11:56:46,110 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:56:46,355 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:56:46,355 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:56:46,620 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:56:48,511 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58861 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:56:48,538 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58858 "/data" { "reqest": "collect data on slaves", "respone":[10.249.9.183:25111=>{"message":"200 OK", "reason":"no data"}]}
+2013-03-08 11:56:51,864 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:58861 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 11:56:51,866 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:58858 "/data" { "reqest": "collect data on slaves", "respone":[10.249.9.183:25111=>{"message":"200 OK", "reason":"no data"}]}
+2013-03-08 11:58:08,179 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:58:08,432 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:58:08,433 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:58:08,702 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 11:58:24,155 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:58:24,269 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:58:24,269 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:58:24,559 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 11:58:28,083 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 11:58:28,319 INFO org.jarachne.util.ZKClient: 
+2013-03-08 11:58:28,319 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 11:58:28,586 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:00:08,869 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:00:09,101 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:00:09,101 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:00:09,366 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:00:42,951 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:00:43,214 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:00:43,214 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:00:43,519 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:01:08,089 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:01:08,358 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:01:08,358 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:01:08,681 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:01:08,769 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 12:04:57,586 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:59679 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:05:01,092 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:59670 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:30:48,182 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:30:48,413 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:30:48,414 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:30:48,696 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:30:58,754 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:62229 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:34:37,944 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:34:38,073 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:34:38,074 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:34:38,396 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 12:34:41,685 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:34:41,965 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:34:41,965 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:34:42,276 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:35:41,052 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:62655 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:36:15,109 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:62655 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:41:51,008 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:41:51,147 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:41:51,148 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:41:51,439 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 12:41:58,768 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:41:58,905 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:41:58,905 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:42:07,894 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:42:08,154 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:42:08,155 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:42:08,445 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:45:32,335 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:45:32,575 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:45:32,576 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:45:32,844 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:45:38,090 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:45:38,396 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:45:38,397 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:45:38,724 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:45:38,822 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 12:47:29,952 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:63929 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:48:25,366 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64068 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:48:31,418 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64055 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:53:13,983 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:53:14,309 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:53:14,309 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:53:14,572 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:53:14,657 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 12:53:17,722 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64512 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:53:18,321 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64509 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:53:20,269 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64525 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:53:20,769 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64509 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:53:22,028 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64534 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:53:22,527 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64509 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:53:23,590 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64544 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:53:24,089 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64509 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:54:04,967 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64610 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:54:05,465 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64509 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:54:30,487 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:54:30,736 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:54:30,736 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:54:30,999 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:54:34,083 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64674 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:54:34,664 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64671 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:56:18,805 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:56:19,045 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:56:19,045 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:56:19,320 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:56:22,610 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64870 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:56:23,210 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64867 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:56:24,819 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:64880 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 12:56:25,318 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:64867 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 12:58:52,961 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 12:58:53,503 INFO org.jarachne.util.ZKClient: 
+2013-03-08 12:58:53,503 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 12:58:53,817 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 12:58:53,916 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 13:01:23,007 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:01:23,294 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:01:23,294 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:01:36,353 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:01:36,625 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:01:36,626 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:01:36,961 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:01:37,058 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 13:04:39,271 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:49235 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:04:39,876 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:65432 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 13:07:05,975 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:07:06,308 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:07:06,309 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:07:06,639 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:07:55,795 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:07:56,083 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:07:56,084 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:07:56,423 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:07:56,515 WARN org.jarachne.util.ZKClient: Node /jarachne/master/localhost:24111 exisit,delete and create again
+2013-03-08 13:08:28,769 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:49693 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:13:13,799 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:13:14,074 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:13:14,074 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:13:14,374 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:16:02,551 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:50430 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:31:06,229 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:31:06,493 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:31:06,493 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:31:06,770 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:31:08,820 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:52006 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:31:08,909 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:52003 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 13:31:10,147 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:52017 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:31:10,155 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:52003 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 13:39:08,839 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 13:39:09,116 INFO org.jarachne.util.ZKClient: 
+2013-03-08 13:39:09,116 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 13:39:09,504 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 13:39:10,713 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:52879 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 13:39:10,800 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:52876 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 15:12:55,582 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 15:12:55,826 INFO org.jarachne.util.ZKClient: 
+2013-03-08 15:12:55,826 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 15:12:56,122 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 15:12:57,303 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 15:12:57,439 INFO org.jarachne.util.ZKClient: 
+2013-03-08 15:12:57,439 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 15:12:57,747 INFO org.jarachne.sentry.core.SlaveServer: [jarachne.slave] started at : /10.249.9.183:25111 
+2013-03-08 15:13:22,378 INFO org.jarachne.network.http.BaseChannelHandler: 10.249.9.183:63593 "/data" {"message":"200 OK", "reason":"no data"}
+2013-03-08 15:13:22,450 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:63590 "/data" { "reqest": "collect data on slaves", "respone":{"/10.249.9.183:25111":{"message":"200 OK","reason":"no data"}}}
+2013-03-08 15:13:28,077 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:63590 "/li" {"message":"400 Bad Request", "reason":"path not found! current_path : [/data, /local/data]"}
+2013-03-08 15:16:19,523 INFO org.jarachne.common.Config: loading config from:D:\dev\git\jarachne\jarachne-sentry\.\conf\config.properties
+2013-03-08 15:16:19,767 INFO org.jarachne.util.ZKClient: 
+2013-03-08 15:16:19,767 WARN org.jarachne.util.ZKClient: ZKSyncConnected! WatchedEvent state:SyncConnected type:None path:null
+2013-03-08 15:16:20,056 INFO org.jarachne.sentry.core.MasterServer: [jarachne.master] started at : localhost/127.0.0.1:24111 
+2013-03-08 15:16:22,461 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:63881 "/li" {"message":"400 Bad Request", "reason":"path not found! current_path : [/status, /data, /local/data]"}
+2013-03-08 15:16:27,243 INFO org.jarachne.network.http.BaseChannelHandler: 127.0.0.1:63881 "/status" { "reqest": "live nodes", "respone":{"live_slaves":["10.249.9.183:25111"]}}

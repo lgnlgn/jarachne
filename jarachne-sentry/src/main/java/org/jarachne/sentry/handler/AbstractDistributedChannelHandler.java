@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.json.JSONObject;
+
 import org.jarachne.network.http.NettyHttpRequest;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -20,7 +22,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
  * @author lgn-mop
  *
  */
-public abstract class AbstractDistributedChannelHandler extends SimpleChannelUpstreamHandler implements RequestHandler{
+public abstract class AbstractDistributedChannelHandler extends SimpleChannelUpstreamHandler{
 
 	protected Collection<String> slaves;
 	protected Map<String, String> collectedResults;
@@ -33,7 +35,11 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 	 */
 	abstract public String requestSlaveUri();
 	
-	abstract public String processResult();
+	public String processResult(){
+		JSONObject jo = new JSONObject();
+		jo.putAll(collectedResults);
+		return jo.toString();
+	}
 	
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)throws Exception {
 		HttpMessage message = (HttpMessage)e.getMessage();
