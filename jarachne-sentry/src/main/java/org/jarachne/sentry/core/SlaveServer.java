@@ -7,7 +7,7 @@ import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
 import org.jarachne.sentry.slave.SlaveModule;
-import org.jarachne.sentry.slave.handler.local.DataReportHandler;
+import org.jarachne.sentry.slave.handler.DataReportHandler;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -22,7 +22,7 @@ public class SlaveServer extends BaseNioServer{
 	final BaseChannelHandler channel = new BaseChannelHandler(handlers);
 	
 	public SlaveServer(SlaveModule module)throws KeeperException, InterruptedException{
-		super();
+//		super();
 		log = Loggers.getLogger(SlaveServer.class);
 	}
 	

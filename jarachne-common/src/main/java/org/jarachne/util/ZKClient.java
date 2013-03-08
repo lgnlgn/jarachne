@@ -43,10 +43,10 @@ public class ZKClient
     private volatile ZooKeeper zooKeeper;
     static private ZKClient CLIENT;
     private ExecutorService watchExecutorService = JMXConfigurableThreadPoolExecutor.newCachedThreadPool("zk-task");// Executors.newCachedThreadPool();
-    private ConcurrentMap<Object, WatchBag> watches = new java.util.concurrent.ConcurrentHashMap();
-	private Map<String,String> ephemeralNodes=new ConcurrentHashMap();
-	private List<RetryRun> tries=Collections.synchronizedList( new LinkedList());
-	private List<RetryRun> watchTries=Collections.synchronizedList( new LinkedList());
+    private ConcurrentMap<Object, WatchBag> watches = new java.util.concurrent.ConcurrentHashMap<Object, WatchBag>();
+	private Map<String,String> ephemeralNodes=new ConcurrentHashMap<String,String>();
+	private List<RetryRun> tries=Collections.synchronizedList( new LinkedList<RetryRun>());
+	private List<RetryRun> watchTries=Collections.synchronizedList( new LinkedList<RetryRun>());
 	
     final Watcher defaultWatch = new Watcher()
     {
@@ -1068,7 +1068,7 @@ public class ZKClient
                             {
                                 try
                                 {
-                                    Thread.currentThread().sleep((long) (300));
+                                    Thread.sleep((long) (300));
                                 }
                                 catch (InterruptedException e)
                                 {
@@ -1253,7 +1253,7 @@ public class ZKClient
     {
         List<String> ss = getChildren(path);
 
-        Map<String, String> v = new TreeMap();
+        Map<String, String> v = new TreeMap<String, String>();
         for (String s: ss)
         {
             v.put(s, getStringData(path + "/" + s));

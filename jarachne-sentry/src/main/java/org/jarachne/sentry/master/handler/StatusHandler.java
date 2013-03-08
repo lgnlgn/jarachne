@@ -1,4 +1,4 @@
-package org.jarachne.sentry.master.handler.local;
+package org.jarachne.sentry.master.handler;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -27,7 +27,10 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 	protected Collection<String> slaves;
 	protected Map<String, String> collectedResults;
 
-	
+	protected AbstractDistributedChannelHandler(){
+		this.slaves = new ArrayList<String>();
+		this.collectedResults = new ConcurrentHashMap<String, String>();
+	}
 	/**
 	 * uri path sent request to slaves
 	 * <p> need to be the same to the slave.getPath()</p>

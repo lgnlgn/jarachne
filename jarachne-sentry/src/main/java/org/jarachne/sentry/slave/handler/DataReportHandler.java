@@ -1,4 +1,4 @@
-package org.jarachne.sentry.slave.handler.local;
+package org.jarachne.sentry.slave.handler;
 
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;

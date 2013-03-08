@@ -1,4 +1,4 @@
-package org.jarachne.sentry.master.handler.local;
+package org.jarachne.sentry.master.handler;
 
 import java.io.File;
 import java.util.ArrayList;

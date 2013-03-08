@@ -3,7 +3,12 @@ package org.jarachne.sentry.master;
 import static org.jboss.netty.channel.Channels.pipeline;
 
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +29,8 @@ import org.jarachne.util.ZKClient;
 import org.jarachne.util.ZKClient.ChildrenWatcher;
 import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -36,6 +43,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
 public class MasterModule extends Module{
 	private volatile Map<String, String> slaves;
@@ -138,7 +146,57 @@ public class MasterModule extends Module{
 	}
 	
 	
-	
+	public String sendFileToSlaves(AbstractDistributedChannelHandler tsReq, String filePath) throws InterruptedException, IOException{
+		if (slaves.isEmpty()){
+			return "";
+		}
+		List<String> slaves = yieldSlaves();
+		final AbstractDistributedChannelHandler channelHandler = tsReq.clone( slaves);
+		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
+		{
+
+			public ChannelPipeline getPipeline() throws Exception
+			{
+				ChannelPipeline pipeline = pipeline();
+				pipeline.addLast("decoder", new HttpResponseDecoder());
+				pipeline.addLast("encoder", new HttpRequestEncoder());
+				pipeline.addLast("handler", channelHandler);
+				pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+				return pipeline;
+			}
+
+		});
+		ArrayList<ChannelFuture> channelFutrueList = new ArrayList<ChannelFuture>(slaves.size());
+		for(String slaveAddress : slaves){
+			int idx = slaveAddress.indexOf(':');
+			InetSocketAddress  isa = new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1)));
+			ChannelFuture future = bootstrap.connect(isa);
+			channelFutrueList.add(future);
+			
+		}
+		waitFutures(channelFutrueList, 1000);
+		ArrayList<ChannelFuture> reqCF = new ArrayList<ChannelFuture>();
+		
+		
+		String[] fileName = filePath.split("/");
+		FileChannel fc = new FileInputStream(filePath).getChannel();
+		
+		RandomAccessFile raf = new RandomAccessFile(filePath, "r");
+		byte[] file = new byte[(int)raf.length()];
+		raf.read(file);
+		raf.close();
+		for(ChannelFuture cf : channelFutrueList){
+			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.requestSlaveUri());
+			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
+			req.setHeader("filename", fileName[fileName.length-1]);
+			req.setContent(ChannelBuffers.copiedBuffer(file));
+			Channel ch = cf.getChannel();
+			reqCF.add(ch.write(req));
+
+		}
+		return "111";
+	}
 	
 	public String requestSlaves(AbstractDistributedChannelHandler tsReq, long soTimeOut) throws InterruptedException{
 		if (slaves.isEmpty()){
