@@ -23,6 +23,7 @@ import org.apache.zookeeper.KeeperException;
 import org.jarachne.common.Config;
 import org.jarachne.common.Constants;
 import org.jarachne.common.HttpRequestCallable;
+import org.jarachne.common.JobManager;
 import org.jarachne.sentry.core.Module;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.util.ZKClient;
@@ -46,6 +47,8 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
 public class MasterModule extends Module{
+	
+	private JobManager masterJobManager;
 	private volatile Map<String, String> slaves;
 	private String dataDir;
 	public ClientBootstrap bootstrap;
@@ -63,6 +66,7 @@ public class MasterModule extends Module{
 		ZKClient.get().createIfNotExist(Constants.ZK_MASTER_PATH);
 		ZKClient.get().createIfNotExist(Constants.ZK_SLAVE_PATH);
 		this.watchZookeeper();
+		this.masterJobManager = new JobManager();
 	}
 
 	
@@ -111,8 +115,8 @@ public class MasterModule extends Module{
 		return a;
 	}
 	
-	public String requestSlaves(AbstractDistributedChannelHandler tsReq) throws InterruptedException, ExecutionException{
-		return this.requestSlaves(tsReq, 2000);
+//	public String requestSlaves(AbstractDistributedChannelHandler tsReq) throws InterruptedException, ExecutionException{
+//		return this.requestSlaves(tsReq, 2000);
 //		List<String> slaves = yieldSlaves();
 //		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
 //		for(String slaveAddr: slaves){
@@ -120,131 +124,14 @@ public class MasterModule extends Module{
 //		}
 //		List<String> results = ConcurrentExecutor.execute(distributedReqs);
 //		return results.toString();
+//	}
+	
+
+	
+	public ClientBootstrap getBootstrap(){
+		return this.bootstrap;
 	}
 	
-	
-	
-	private static boolean waitFutures(List<ChannelFuture> cfs, long timeOut) throws InterruptedException{
-		int i = 0 ;
-		long t = System.currentTimeMillis();
-		while(true){
-			for(ChannelFuture cf : cfs){
-				if (cf.isDone()){
-					i += 1;
-				}
-			}
-			if (i == cfs.size())
-				return true;
-			else {
-				i = 0;
-			}
-			long t2 = System.currentTimeMillis() -t;
-			if (t2 > timeOut)
-				return false;
-			Thread.sleep(10);
-		}
-	}
-	
-	
-	public String sendFileToSlaves(AbstractDistributedChannelHandler tsReq, String filePath) throws InterruptedException, IOException{
-		if (slaves.isEmpty()){
-			return "";
-		}
-		List<String> slaves = yieldSlaves();
-		final AbstractDistributedChannelHandler channelHandler = tsReq.clone( slaves);
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
-		{
-
-			public ChannelPipeline getPipeline() throws Exception
-			{
-				ChannelPipeline pipeline = pipeline();
-				pipeline.addLast("decoder", new HttpResponseDecoder());
-				pipeline.addLast("encoder", new HttpRequestEncoder());
-				pipeline.addLast("handler", channelHandler);
-				pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-				return pipeline;
-			}
-
-		});
-		ArrayList<ChannelFuture> channelFutrueList = new ArrayList<ChannelFuture>(slaves.size());
-		for(String slaveAddress : slaves){
-			int idx = slaveAddress.indexOf(':');
-			InetSocketAddress  isa = new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1)));
-			ChannelFuture future = bootstrap.connect(isa);
-			channelFutrueList.add(future);
-			
-		}
-		waitFutures(channelFutrueList, 1000);
-		ArrayList<ChannelFuture> reqCF = new ArrayList<ChannelFuture>();
-		
-		
-		String[] fileName = filePath.split("/");
-		FileChannel fc = new FileInputStream(filePath).getChannel();
-		
-		RandomAccessFile raf = new RandomAccessFile(filePath, "r");
-		byte[] file = new byte[(int)raf.length()];
-		raf.read(file);
-		raf.close();
-		for(ChannelFuture cf : channelFutrueList){
-			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.requestSlaveUri());
-			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
-			req.setHeader("filename", fileName[fileName.length-1]);
-			req.setContent(ChannelBuffers.copiedBuffer(file));
-			Channel ch = cf.getChannel();
-			reqCF.add(ch.write(req));
-
-		}
-		return "111";
-	}
-	
-	public String requestSlaves(AbstractDistributedChannelHandler tsReq, long soTimeOut) throws InterruptedException{
-		if (slaves.isEmpty()){
-			return "";
-		}
-		List<String> slaves = yieldSlaves();
-		final AbstractDistributedChannelHandler channelHandler = tsReq.clone(slaves);
-		
-		
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
-		{
-
-			public ChannelPipeline getPipeline() throws Exception
-			{
-				ChannelPipeline pipeline = pipeline();
-
-				pipeline.addLast("decoder", new HttpResponseDecoder());
-//				pipeline.addLast("aggregator", new HttpChunkAggregator(6048576));
-				pipeline.addLast("encoder", new HttpRequestEncoder());
-				pipeline.addLast("handler", channelHandler);
-
-				return pipeline;
-			}
-
-		});
-		ArrayList<ChannelFuture> channelFutrueList = new ArrayList<ChannelFuture>(slaves.size());
-		for(String slaveAddress : slaves){
-			int idx = slaveAddress.indexOf(':');
-			InetSocketAddress  isa = new InetSocketAddress(slaveAddress.substring(0, idx), new Integer(slaveAddress.substring(idx + 1)));
-			ChannelFuture future = bootstrap.connect(isa);
-			channelFutrueList.add(future);
-			
-		}
-		waitFutures(channelFutrueList, 1000);
-
-		ArrayList<ChannelFuture> reqCF = new ArrayList<ChannelFuture>();
-
-		for(ChannelFuture cf : channelFutrueList){
-			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, tsReq.requestSlaveUri());
-			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
-			Channel ch = cf.getChannel();
-			reqCF.add(ch.write(req));
-
-		}
-		waitFutures(reqCF, 1000);
-		return channelHandler.processResult();	
-	}
 
 	
 }

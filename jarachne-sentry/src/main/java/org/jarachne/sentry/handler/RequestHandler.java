@@ -13,9 +13,7 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 public abstract class RequestHandler implements Handler{
 	
 	protected Module module;
-	/**
-	 *  for distributed request
-	 */
+	// for distributed request
 	protected AbstractDistributedChannelHandler channel;
 	
 	public RequestHandler(Module module, AbstractDistributedChannelHandler channel){

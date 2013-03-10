@@ -1,5 +1,6 @@
 package org.jarachne.sentry.handler;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -7,15 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.json.JSONObject;
 
-import org.jarachne.network.http.NettyHttpRequest;
-import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.HttpMessage;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 
 /**
  * channel for distributed requests
@@ -23,13 +21,15 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
  *
  */
 public abstract class AbstractDistributedChannelHandler extends SimpleChannelUpstreamHandler{
-
+	
+	
+	
 	protected Collection<String> slaves;
-	protected Map<String, String> collectedResults;
+	protected Map<String, String> callbacks; 
 
 	protected AbstractDistributedChannelHandler(){
 		this.slaves = new ArrayList<String>();
-		this.collectedResults = new ConcurrentHashMap<String, String>();
+		this.callbacks = new ConcurrentHashMap<String, String>();
 	}
 	/**
 	 * uri path sent request to slaves
@@ -40,15 +40,14 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 	
 	public String processResult(){
 		JSONObject jo = new JSONObject();
-		jo.putAll(collectedResults);
+		jo.putAll(callbacks);
 		return jo.toString();
 	}
 	
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)throws Exception {
 		HttpMessage message = (HttpMessage)e.getMessage();
-		String remoteAddress = e.getRemoteAddress().toString();
-		this.collectedResults.put(remoteAddress, new String(message.getContent().array()));
-//		e.getFuture().addListener(ChannelFutureListener.CLOSE);
+		String remoteAddress = e.getRemoteAddress().toString().substring(1); // trim first '/'
+		this.callbacks.put(remoteAddress, new String(message.getContent().array()));
 
 	}
 	
@@ -56,5 +55,31 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 		e.getChannel().close();
 	}
 	
-	abstract public AbstractDistributedChannelHandler clone(Collection<String> currentSlaves) ;
+	/**
+	 * create a ChannelHandler with slave addressed for ClientBootstrap's pipeline
+	 * @param currentSlaves
+	 * @return
+	 */
+	public abstract AbstractDistributedChannelHandler clone(Collection<String> currentSlaves) ;
+
+	public static boolean waitChannelFutures(List<ChannelFuture> futures, long timeOut) throws InterruptedException{
+		int i = 0 ;
+		long t = System.currentTimeMillis();
+		while(true){
+			for(ChannelFuture cf : futures){
+				if (cf.isDone()){
+					i += 1;
+				}
+			}
+			if (i == futures.size())
+				return true;
+			else {
+				i = 0;
+			}
+			long t2 = System.currentTimeMillis() -t;
+			if (t2 > timeOut)
+				return false;
+			Thread.sleep(5);
+		}
+	}
 }
