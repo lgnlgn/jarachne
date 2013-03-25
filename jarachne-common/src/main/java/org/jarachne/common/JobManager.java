@@ -8,29 +8,26 @@ import org.jarachne.common.JarachneException;
 
 import net.sf.json.JSONObject;
 
+@Deprecated
 public class JobManager implements Runnable{
 	
-	public interface Job extends Runnable{
-		
-		public int autoExpireTime();
-		
-		public String getJobName();
-		
-		public String getJobStatus();
-		
-		
-		/**
-		 * force close
-		 */
-		public void releaseResource();
-		
-		public boolean isRunning();
-	}
+//	public interface Job extends Runnable{
+//		
+//		public int autoExpireTime();
+//		
+//		public String getJobName();
+//		
+//		public String getJobStatus();
+//		
+//		public void addMessage(String content);
+//		/**
+//		 * force close
+//		 */
+//		public void releaseResource();
+//		
+//		public boolean isRunning();
+//	}
 	
-
-	
-//	final static int NUM_FILE_JOB_ALLOWED = 3;
-//	private volatile Map<String, CommonJob> fileTransmissions = new ConcurrentHashMap<String, CommonJob>();
 	private volatile Job running ;
 	private volatile String lastJobState;
 	
@@ -43,6 +40,11 @@ public class JobManager implements Runnable{
 		this.managerThread.start();
 	}
 
+	public void addMessageToJob(String content){
+		if (running != null)
+			running.addMessage(content + "\n");
+	}
+	
 	
 	private synchronized void clearJob(){
 		jobRunnerThread = null;

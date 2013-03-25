@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.jarachne.common.Config;
 
@@ -41,6 +42,24 @@ public class ConcurrentExecutor {
 		
 		return get( asyncExecute( taskList ) );
 	}
+	
+	
+	/**
+	 * sync 
+	 * @param taskList
+	 * @param timeOut
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 * @throws TimeoutException
+	 */
+	public static <Response>List<Response> execute( List<Callable<Response>> taskList, long timeOut )
+			throws InterruptedException, ExecutionException, TimeoutException{
+			
+			return get( asyncExecute( taskList ), timeOut );
+		}
+	
+	
 	
 	/**
 	 * async
@@ -75,5 +94,19 @@ public class ConcurrentExecutor {
 		return respList;
 		
 	}
+	
+	
+	public static <Response>List<Response> get( List<Future<Response>> futureList, long timeOut )
+			throws InterruptedException, ExecutionException, TimeoutException{
+			
+			List<Response> respList= new ArrayList<Response>( futureList.size() );
+			
+			for( int i = 0; i < futureList.size(); i++ ){
+				respList.add( i , futureList.get( i ).get(timeOut, TimeUnit.MILLISECONDS) );
+			}
+			return respList;
+			
+		}
+	
 	
 }

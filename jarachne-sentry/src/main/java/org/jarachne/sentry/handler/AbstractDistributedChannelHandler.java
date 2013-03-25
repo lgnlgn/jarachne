@@ -21,14 +21,10 @@ import org.jboss.netty.handler.codec.http.HttpMessage;
  *
  */
 public abstract class AbstractDistributedChannelHandler extends SimpleChannelUpstreamHandler{
-	
-	
-	
-	protected Collection<String> slaves;
+
 	protected Map<String, String> callbacks; 
 
 	protected AbstractDistributedChannelHandler(){
-		this.slaves = new ArrayList<String>();
 		this.callbacks = new ConcurrentHashMap<String, String>();
 	}
 	/**
@@ -48,7 +44,6 @@ public abstract class AbstractDistributedChannelHandler extends SimpleChannelUps
 		HttpMessage message = (HttpMessage)e.getMessage();
 		String remoteAddress = e.getRemoteAddress().toString().substring(1); // trim first '/'
 		this.callbacks.put(remoteAddress, new String(message.getContent().array()));
-
 	}
 	
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception{

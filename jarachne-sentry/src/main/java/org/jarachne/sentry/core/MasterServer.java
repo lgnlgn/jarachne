@@ -13,7 +13,8 @@ import org.jarachne.network.http.Handlers;
 import org.jarachne.sentry.master.MasterModule;
 import org.jarachne.sentry.master.handler.DataCollectHandler;
 import org.jarachne.sentry.master.handler.DataDisplayHandler;
-import org.jarachne.sentry.master.handler.FileSendHandler;
+import org.jarachne.sentry.master.handler.FileDistributeHandler;
+
 import org.jarachne.sentry.master.handler.StatusHandler;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -82,7 +83,7 @@ public class MasterServer extends BaseNioServer{
 		mserver.addHandler(new DataDisplayHandler(module));
 		mserver.addHandler(new DataCollectHandler(module));
 		mserver.addHandler(new StatusHandler(module));
-		mserver.addHandler(new FileSendHandler(module));
+		mserver.addHandler(new FileDistributeHandler(module));
 		mserver.start();
 		module.register(Constants.ZK_MASTER_PATH, mserver.getServerAddress());
 	}

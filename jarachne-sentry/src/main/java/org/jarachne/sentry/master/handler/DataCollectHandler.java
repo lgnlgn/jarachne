@@ -7,14 +7,22 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
+import org.jarachne.sentry.core.HttpRequestCallable;
+import org.jarachne.sentry.core.SentryConstants;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.sentry.handler.RequestHandler;
 import org.jarachne.sentry.master.MasterModule;
 
+import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jarachne.util.logging.ESLogger;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -30,11 +38,14 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
 public class DataCollectHandler extends RequestHandler{
 	static ESLogger log = Loggers.getLogger(DataCollectHandler.class);
+	
+	private String toSlavePath = SentryConstants.Paths.SLAVE_REPORT_DATA_PATH;
 	
 	static class DataCollectChannelHandler extends AbstractDistributedChannelHandler{
 		@Override
@@ -46,7 +57,9 @@ public class DataCollectHandler extends RequestHandler{
 		public AbstractDistributedChannelHandler clone(
 				Collection<String> currentSlaves) {
 			DataCollectChannelHandler ch = new DataCollectChannelHandler();
-			ch.slaves.addAll(currentSlaves);
+			for(String slaveAddress: currentSlaves){
+				ch.callbacks.put(slaveAddress, "waiting");
+			}
 			return ch;
 		}
 	}
@@ -65,14 +78,46 @@ public class DataCollectHandler extends RequestHandler{
 		MasterModule m = ((MasterModule)module);
 		
 		try {
-			String result = this.requestSlaves(m.getBootstrap(), channel, m.yieldSlaves(), 2000);
+			String result = this.requestSlaves(m.httpClient, m.yieldSlaves(), 2000);
+//			String result = this.requestSlaves(m.getBootstrap(), channel, m.yieldSlaves(), 2000);
 			HttpResponseUtil.setResponse(resp, "collect data on slaves", result);
 		} catch (InterruptedException e) {
-			log.error("requestSlaves exception ", e);
+			log.error("requestSlaves InterruptedException ", e);
+		} catch (ExecutionException e) {
+			log.error("requestSlaves ExecutionException ", e);
+			HttpResponseUtil.setResponse(resp, "collect data on slaves", "requestSlaves ExecutionException");
+			resp.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			HttpResponseUtil.setResponse(resp, "collect data on slaves", "requestSlaves TimeoutException");
+			resp.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
 		} 
 		
 	}
 
+	/**
+	 * synchronized request
+	 * @param client
+	 * @param slaves
+	 * @param timeOut
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 * @throws TimeoutException 
+	 */
+	private String requestSlaves(HttpClient client, List<String> slaves, long timeOut) throws InterruptedException, ExecutionException, TimeoutException{
+		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
+		for(String slaveAddr: slaves){
+			HttpUriRequest req = new HttpGet("http://" + slaveAddr + toSlavePath);
+			distributedReqs.add(new HttpRequestCallable(client, req));
+		}
+		List<String> results = ConcurrentExecutor.execute(distributedReqs, 2000);
+		return results.toString();
+	}
+	
+	
+	@Deprecated
 	private String requestSlaves(ClientBootstrap bootstrap, AbstractDistributedChannelHandler toSlaveHandler, List<String> slaves, long timeOut) throws InterruptedException{
 		if (slaves.isEmpty()){
 			return "";
@@ -114,7 +159,6 @@ public class DataCollectHandler extends RequestHandler{
 			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
 			Channel ch = cf.getChannel();
 			reqCF.add(ch.write(req));
-
 		}
 		AbstractDistributedChannelHandler.waitChannelFutures(reqCF, timeOut/2);
 		return channelHandler.processResult();	

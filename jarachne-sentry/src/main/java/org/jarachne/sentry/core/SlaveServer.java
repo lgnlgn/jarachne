@@ -7,8 +7,8 @@ import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
 import org.jarachne.sentry.slave.SlaveModule;
-import org.jarachne.sentry.slave.handler.DataReceiveHandler;
 import org.jarachne.sentry.slave.handler.DataReportHandler;
+import org.jarachne.sentry.slave.handler.FileReceiveHandler;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -72,7 +72,7 @@ public class SlaveServer extends BaseNioServer{
 		SlaveServer server = new SlaveServer(module);
 		
 		server.addHandler(new DataReportHandler(module));
-		server.addHandler(new DataReceiveHandler(module));
+		server.addHandler(new FileReceiveHandler(module));
 		server.start();
 		module.register(Constants.ZK_SLAVE_PATH, server.getServerAddress());
 	}

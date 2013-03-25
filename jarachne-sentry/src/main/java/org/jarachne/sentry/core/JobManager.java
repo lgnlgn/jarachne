@@ -5,32 +5,29 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jarachne.common.JarachneException;
+import org.jarachne.common.Job;
 
 import net.sf.json.JSONObject;
 
 public class JobManager implements Runnable{
 	
-	public interface Job extends Runnable{
-		
-		public int autoExpireTime();
-		
-		public String getJobName();
-		
-		public String getJobStatus();
-		
-		
-		/**
-		 * force close
-		 */
-		public void releaseResource();
-		
-		public boolean isRunning();
-	}
+//	public interface Job extends Runnable{
+//		
+//		public int autoExpireTime();
+//		
+//		public String getJobName();
+//		
+//		public String getJobStatus();
+//		
+//		
+//		/**
+//		 * force close
+//		 */
+//		public void releaseResource();
+//		
+//		public boolean isRunning();
+//	}
 	
-
-	
-//	final static int NUM_FILE_JOB_ALLOWED = 3;
-//	private volatile Map<String, CommonJob> fileTransmissions = new ConcurrentHashMap<String, CommonJob>();
 	private volatile Job running ;
 	private volatile String lastJobState;
 	
@@ -123,6 +120,17 @@ public class JobManager implements Runnable{
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+
+	public void addMessageToJob(String content) {
+		if (running != null){
+			if (content.endsWith("\n")){
+				running.addMessage(content);
+			}else{
+				running.addMessage(content + "\n");
 			}
 		}
 	}

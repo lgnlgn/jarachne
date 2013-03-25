@@ -8,14 +8,22 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
+import org.jarachne.sentry.core.HttpRequestCallable;
 import org.jarachne.sentry.core.Module;
+import org.jarachne.sentry.core.SentryConstants;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.sentry.handler.RequestHandler;
 import org.jarachne.sentry.master.MasterModule;
-import org.jarachne.sentry.master.handler.DataCollectHandler.DataCollectChannelHandler;
+import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jarachne.util.logging.ESLogger;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -35,37 +43,49 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
-public class FileSendHandler extends RequestHandler{
-
+/**
+ * synchronized file distribute handler, only allow small files
+ * URL : http://HOST:PORT/file?filename=
+ * 
+ * @author lgn
+ *
+ */
+public class FileDistributeHandler extends RequestHandler{
+	
+	public final static String PATH = "/file";
+	public final static String KEY_FILENAME = "filename";
+	private String toSlavePath = SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH;
+	
 	static ESLogger log = Loggers.getLogger(DataCollectHandler.class);
 	
 	static class FileSendChannelHandler extends AbstractDistributedChannelHandler{
 		MasterModule module;
 		@Override
 		public String requestSlaveUri() {
-			// TODO Auto-generated method stub
-			return "/file";
+			return SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH;
 		}
 
 		@Override
 		public AbstractDistributedChannelHandler clone(	Collection<String> currentSlaves) {
 			FileSendChannelHandler ch = new FileSendChannelHandler();
-			ch.slaves.addAll(currentSlaves);
+			for(String slaveAddress: currentSlaves){
+				ch.callbacks.put(slaveAddress, "waiting");
+			}
 			return ch;
 		}
 		
 	}
 	
-	public FileSendHandler(Module module) {
+	public FileDistributeHandler(Module module) {
 		super(module, new FileSendChannelHandler());
 	}
 	
 	public String getPath() {
-		return "/file";
+		return PATH;
 	}
 
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {
-		String file = req.param("filename");
+		String file = req.param( KEY_FILENAME);
 		if (file == null){
 			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, "'filepath' not specified!");
 		}else{
@@ -84,9 +104,22 @@ public class FileSendHandler extends RequestHandler{
 		
 	}
 	
+	
+	private String requestSlaves(HttpClient client, List<String> slaves, long timeOut) throws InterruptedException, ExecutionException, TimeoutException{
+		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
+		for(String slaveAddr: slaves){
+			HttpUriRequest req = new HttpGet("http://" + slaveAddr + toSlavePath);
+			distributedReqs.add(new HttpRequestCallable(client, req));
+		}
+		List<String> results = ConcurrentExecutor.execute(distributedReqs, 2000);
+		return results.toString();
+	}
+	
+	
+	
 	private String sendFileToSlaves(ClientBootstrap bootstrap, AbstractDistributedChannelHandler toSlaveChannel, List<String> slaves, String filePath) throws IOException, InterruptedException{
 		if (slaves.isEmpty()){
-			return "";
+			return "no slaves";
 		}
 		final AbstractDistributedChannelHandler channelHandler = toSlaveChannel.clone( slaves);
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory()
@@ -123,7 +156,7 @@ public class FileSendHandler extends RequestHandler{
 		raf.close();
 		for(ChannelFuture cf : channelFutrueList){
 			HttpRequest req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, toSlaveChannel.requestSlaveUri());
-			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+			req.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
 			req.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
 //			req.setChunked(true);
 			req.setHeader("filename", fileName[fileName.length-1]);

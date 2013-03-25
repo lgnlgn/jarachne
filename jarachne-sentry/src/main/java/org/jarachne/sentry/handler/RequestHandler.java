@@ -6,7 +6,8 @@ import org.jarachne.sentry.core.Module;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 
 /**
- * handler #HttpRequest
+ * master handler 
+ * slave handler 
  * @author lgn-mop
  *
  */
