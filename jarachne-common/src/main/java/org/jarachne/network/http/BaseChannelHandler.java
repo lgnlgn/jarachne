@@ -47,8 +47,9 @@ public class BaseChannelHandler extends SimpleChannelHandler {
 		Handler handler = handlers.getHandler(path);
 		DefaultHttpResponse resp = new DefaultHttpResponse(req.getProtocolVersion(), HttpResponseStatus.OK);
 		if (handler == null){
-			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, 
-					"path not found! current_path : " + this.handlers.handlers.keySet());
+			HttpResponseUtil.setResponse(resp, "path :" + path, 
+					"\"path not found! current_path : " + this.handlers.handlers.keySet() + "\"",
+					HttpResponseStatus.BAD_REQUEST		);
 		}else{
 			handler.handle(nhr, resp);
 		}

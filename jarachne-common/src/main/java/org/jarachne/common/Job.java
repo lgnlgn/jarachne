@@ -2,6 +2,10 @@ package org.jarachne.common;
 
 public interface Job extends Runnable{
 	
+	/**
+	 * unit: ms
+	 * @return
+	 */
 	public int autoExpireTime();
 	
 	public String getJobName();

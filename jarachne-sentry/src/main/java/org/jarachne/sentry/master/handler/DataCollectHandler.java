@@ -11,6 +11,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import net.sf.json.JSONObject;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -81,14 +83,8 @@ public class DataCollectHandler extends RequestHandler{
 			String result = this.requestSlaves(m.httpClient, m.yieldSlaves(), 2000);
 //			String result = this.requestSlaves(m.getBootstrap(), channel, m.yieldSlaves(), 2000);
 			HttpResponseUtil.setResponse(resp, "collect data on slaves", result);
-		} catch (InterruptedException e) {
-			log.error("requestSlaves InterruptedException ", e);
-		} catch (ExecutionException e) {
-			log.error("requestSlaves ExecutionException ", e);
-			HttpResponseUtil.setResponse(resp, "collect data on slaves", "requestSlaves ExecutionException");
-			resp.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
-			e.printStackTrace();
-		} catch (TimeoutException e) {
+		
+		} catch (Exception e) {
 			HttpResponseUtil.setResponse(resp, "collect data on slaves", "requestSlaves TimeoutException");
 			resp.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 			e.printStackTrace();
@@ -113,7 +109,7 @@ public class DataCollectHandler extends RequestHandler{
 			distributedReqs.add(new HttpRequestCallable(client, req));
 		}
 		List<String> results = ConcurrentExecutor.execute(distributedReqs, 2000);
-		return results.toString();
+		return HttpRequestCallable.summarizeResult(distributedReqs, results);
 	}
 	
 	
@@ -161,7 +157,7 @@ public class DataCollectHandler extends RequestHandler{
 			reqCF.add(ch.write(req));
 		}
 		AbstractDistributedChannelHandler.waitChannelFutures(reqCF, timeOut/2);
-		return channelHandler.processResult();	
+		return channelHandler.processResult();	 
 	}
 	
 }

@@ -1,40 +1,30 @@
 package org.jarachne.sentry.core;
 
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jarachne.common.JarachneException;
 import org.jarachne.common.Job;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class JobManager implements Runnable{
-	
-//	public interface Job extends Runnable{
-//		
-//		public int autoExpireTime();
-//		
-//		public String getJobName();
-//		
-//		public String getJobStatus();
-//		
-//		
-//		/**
-//		 * force close
-//		 */
-//		public void releaseResource();
-//		
-//		public boolean isRunning();
-//	}
-	
+	public final static int REMAIN_STATES = 10;
 	private volatile Job running ;
-	private volatile String lastJobState;
+//	private volatile String lastJobState;
+	
+	private LinkedList<String> lastedJobStates;
 	
 	private Thread jobRunnerThread;
 	private Thread managerThread;
 	
 	public JobManager(){
+		lastedJobStates = new LinkedList<String>();
 		this.managerThread = new Thread(this);
 		this.managerThread.setDaemon(true);
 		this.managerThread.start();
@@ -43,9 +33,14 @@ public class JobManager implements Runnable{
 	
 	private synchronized void clearJob(){
 		jobRunnerThread = null;
-		lastJobState = running.getJobStatus();
+//		lastJobState = running.getJobStatus();
+		lastedJobStates.addLast(running.getJobStatus());
+		if (lastedJobStates.size() > REMAIN_STATES){
+			lastedJobStates.pollFirst();
+		}
 		running.releaseResource();
 		running = null;
+		System.gc();
 	}
 	
 	private synchronized void startJob(){
@@ -60,8 +55,7 @@ public class JobManager implements Runnable{
 	public synchronized boolean isJobSlotFree(){
 		if (running == null){
 			return true;
-		}
-		if (!running.isRunning()){
+		}else if (!running.isRunning()){
 			clearJob();
 			return true;
 		}
@@ -69,7 +63,21 @@ public class JobManager implements Runnable{
 	}
 	
 	public String getLastJobState(){
-		return this.lastJobState;
+		return this.lastedJobStates.peekLast();
+	}
+	
+	public JSONArray getLatestJobStates() {
+		JSONArray ja = new JSONArray();
+		ja.addAll(this.lastedJobStates);
+		return ja;
+	}
+	
+	public String getCurrentJobState(){
+		if (!isJobSlotFree()){
+			return running.getJobStatus();
+		}else{ //free
+			return " no job running ";
+		}
 	}
 	
 	/**

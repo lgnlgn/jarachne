@@ -12,9 +12,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import net.sf.json.JSONObject;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ByteArrayEntity;
+import org.jarachne.common.Constants;
 import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
 import org.jarachne.sentry.core.HttpRequestCallable;
@@ -87,17 +92,16 @@ public class FileDistributeHandler extends RequestHandler{
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {
 		String file = req.param( KEY_FILENAME);
 		if (file == null){
-			HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.BAD_REQUEST, "'filepath' not specified!");
+			HttpResponseUtil.setResponse(resp, "FileDistributeHandler", "\"'filepath' not specified!\"", HttpResponseStatus.BAD_REQUEST );
 		}else{
 			MasterModule m = (MasterModule)module;
-			String filePath = m.getDataDir() + "/" + file;
+			String filePath =  file;
 			try {
-				String  resultString = this.sendFileToSlaves(m.getBootstrap(), channel, m.yieldSlaves(), filePath);
+//				String  resultString = this.sendFileToSlaves(m.getBootstrap(), channel, m.yieldSlaves(), filePath);
+				String resultString = this.requestSlaves(m.httpClient, m.yieldSlaves(), filePath, 20000);
 				HttpResponseUtil.setResponse(resp, "send " + filePath + " to slaves", resultString);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				HttpResponseUtil.setHttpResponseWithMessage(resp, HttpResponseStatus.INTERNAL_SERVER_ERROR, "file send job failed!");
+			} catch (Exception e) {
+				HttpResponseUtil.setResponse(resp, "FileDistributeHandler", "\"file send job failed!\"", HttpResponseStatus.INTERNAL_SERVER_ERROR );
 				e.printStackTrace();
 			}
 		}
@@ -105,18 +109,25 @@ public class FileDistributeHandler extends RequestHandler{
 	}
 	
 	
-	private String requestSlaves(HttpClient client, List<String> slaves, long timeOut) throws InterruptedException, ExecutionException, TimeoutException{
+	private String requestSlaves(HttpClient client, List<String> slaves, String filePath, long timeOut) throws InterruptedException, ExecutionException, TimeoutException, IOException{
 		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> ();
+		RandomAccessFile raf = new RandomAccessFile( Constants.DATA_PATH + "/"  + filePath, "r");
+		byte[] file = new byte[(int)raf.length()];
+		raf.read(file);
+		raf.close();
 		for(String slaveAddr: slaves){
-			HttpUriRequest req = new HttpGet("http://" + slaveAddr + toSlavePath);
-			distributedReqs.add(new HttpRequestCallable(client, req));
+//			HttpUriRequest req = new HttpGet("http://" + slaveAddr + toSlavePath);
+			HttpPost post = new HttpPost("http://" + slaveAddr + toSlavePath);
+			post.setEntity(new ByteArrayEntity(file));
+			post.addHeader(KEY_FILENAME, filePath);
+			distributedReqs.add(new HttpRequestCallable(client, post));
 		}
-		List<String> results = ConcurrentExecutor.execute(distributedReqs, 2000);
-		return results.toString();
+		List<String> results = ConcurrentExecutor.execute(distributedReqs, timeOut);
+		return HttpRequestCallable.summarizeResult(distributedReqs, results);
 	}
 	
 	
-	
+	@Deprecated
 	private String sendFileToSlaves(ClientBootstrap bootstrap, AbstractDistributedChannelHandler toSlaveChannel, List<String> slaves, String filePath) throws IOException, InterruptedException{
 		if (slaves.isEmpty()){
 			return "no slaves";

@@ -2,12 +2,18 @@ package org.jarachne.network.http;
 
 import java.nio.charset.Charset;
 
+import net.sf.json.JSONObject;
+
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 public class HttpResponseUtil {
 	
+	public final static String RESPONSE = "response";
+	public final static String REQUEST = "request";
+	
+	/*
 	final static String basicFormat = "{\"message\":\"%s\"}";
 	final static String messageFormat = "{\"message\":\"%s\", \"reason\":\"%s\"}";
 	
@@ -24,9 +30,7 @@ public class HttpResponseUtil {
 	}
 	
 	
-	/*
-	 * Set server error response
-	 */
+
 	public static void setServerErrorResp( DefaultHttpResponse resp ){
 		setHttpResponseWithStatus(resp, HttpResponseStatus.SERVICE_UNAVAILABLE);
 	}
@@ -36,9 +40,6 @@ public class HttpResponseUtil {
 	}
 	
 	
-	/*
-	 * Set server error response
-	 */
 	public static void setParameterErrorResp( DefaultHttpResponse resp ){
 		setHttpResponseWithStatus(resp, HttpResponseStatus.BAD_REQUEST);
 	}
@@ -57,12 +58,17 @@ public class HttpResponseUtil {
 		resp.setStatus( HttpResponseStatus.OK );
 		resp.setContent(ChannelBuffers.copiedBuffer( content));
 	}
+	*/
 	
 	public static void setResponse( DefaultHttpResponse resp, String respHead, String respBody){
-		resp.setStatus( HttpResponseStatus.OK );
-		StringBuilder builder = new StringBuilder();
-		builder.append("{ \"reqest\": \"" + respHead + "\", \"respone\":" ).append(respBody).append("}");
-		
-		resp.setContent(ChannelBuffers.copiedBuffer( builder.toString().getBytes()));
+		setResponse(resp, respHead, respBody, HttpResponseStatus.OK);
+	}
+	
+	public static void setResponse( DefaultHttpResponse resp, String respHead, String respBody, HttpResponseStatus status){
+		resp.setStatus( status );
+		JSONObject json = new JSONObject();
+		json.put(REQUEST , respHead);
+		json.put(RESPONSE , respBody);
+		resp.setContent(ChannelBuffers.copiedBuffer( json.toString().getBytes()));
 	}
 }

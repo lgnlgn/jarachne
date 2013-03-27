@@ -11,9 +11,11 @@ import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
 import org.jarachne.sentry.master.MasterModule;
+import org.jarachne.sentry.master.handler.DataAllocateHandler;
 import org.jarachne.sentry.master.handler.DataCollectHandler;
 import org.jarachne.sentry.master.handler.DataDisplayHandler;
 import org.jarachne.sentry.master.handler.FileDistributeHandler;
+import org.jarachne.sentry.master.handler.JobHandler;
 
 import org.jarachne.sentry.master.handler.StatusHandler;
 import org.jarachne.util.logging.Loggers;
@@ -84,6 +86,8 @@ public class MasterServer extends BaseNioServer{
 		mserver.addHandler(new DataCollectHandler(module));
 		mserver.addHandler(new StatusHandler(module));
 		mserver.addHandler(new FileDistributeHandler(module));
+		mserver.addHandler(new DataAllocateHandler(module));
+		mserver.addHandler(new JobHandler(module));
 		mserver.start();
 		module.register(Constants.ZK_MASTER_PATH, mserver.getServerAddress());
 	}

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.jarachne.common.Constants;
+import org.jarachne.network.http.HttpResponseUtil;
 import org.jarachne.network.http.NettyHttpRequest;
 import org.jarachne.sentry.core.Module;
 import org.jarachne.sentry.core.SentryConstants;
@@ -15,6 +16,7 @@ import org.jarachne.sentry.slave.SlaveModule;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * 
@@ -36,23 +38,25 @@ public class FileReceiveHandler extends RequestHandler{
 
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {
 		String filename = req.header(SentryConstants.HeaderKeys.FILENAME);
-		String dataname = req.header(SentryConstants.HeaderKeys.DATANAME);
 		if (filename == null){
 			resp.setContent(ChannelBuffers.copiedBuffer(EXCEPTION_STRING.getBytes()));
 			return ;
 		}
-		if (dataname != null){
-			new File(((SlaveModule)module).getDataDir() + "/" + dataname ).mkdir();
- 		}
+		int didx = filename.lastIndexOf("/");
+		if (didx > 0){
+			String dir = ((SlaveModule)module).getDataDir() + "/" + filename.substring(0, didx);
+			new File( dir ).mkdirs();
+			System.out.println(dir);
+		}
 		byte[] file = req.getRequest().getContent().array();
 		try{
 			BufferedOutputStream bos = new BufferedOutputStream(
 					new FileOutputStream(((SlaveModule)module).getDataDir() + "/" + filename));
 			bos.write(file);
 			bos.close();
-			resp.setContent(ChannelBuffers.copiedBuffer(SUCCESS_STRING.getBytes()));
+			HttpResponseUtil.setResponse(resp, "FileReceiveHandler", SUCCESS_STRING);
 		}catch (IOException e) {
-			resp.setContent(ChannelBuffers.copiedBuffer(EXCEPTION_STRING.getBytes()));
+			HttpResponseUtil.setResponse(resp, "FileReceiveHandler", EXCEPTION_STRING, HttpResponseStatus.INTERNAL_SERVER_ERROR);
 			e.printStackTrace();
 		}
 		

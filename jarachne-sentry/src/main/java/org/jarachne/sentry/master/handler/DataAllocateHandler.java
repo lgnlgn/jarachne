@@ -29,6 +29,7 @@ import org.jarachne.sentry.core.SentryConstants;
 import org.jarachne.sentry.handler.RequestHandler;
 import org.jarachne.sentry.master.MasterModule;
 import org.jarachne.sentry.slave.handler.FileReceiveHandler;
+import org.jarachne.util.JsonStringUtil;
 import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -36,14 +37,14 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * send data blocks to slaves,  
- * URL format: http://HOST:PORT/distributedata?name=
+ * trigger URL format: http://HOST:PORT/distributedata?name=
  * @author lgn
  *
  */
 public class DataAllocateHandler extends RequestHandler{
 
 	public static String PATH =  "/distributedata";
-	final static String KEY_BLOCK = "block";
+	final static String KEY_BLOCK = "blocks";
 	public final static String KEY_DATA = "name";
 	final static int TRIES = 2;
 	public DataAllocateHandler(Module module) {
@@ -52,8 +53,8 @@ public class DataAllocateHandler extends RequestHandler{
 
 	private int getNumbBlocks(String dataName) throws  IOException{
 		File data = new File(Constants.DATA_PATH + "/" + dataName);
-		if (!data.isDirectory() ){
-			File dataProperties =  new File(Constants.DATA_PATH + "/" + dataName + Constants.DATA_SUFFIXES[0] );
+		if (data.isDirectory()){
+			File dataProperties =  new File(String.format("%s/%s/%s%s", Constants.DATA_PATH , dataName,  dataName, Constants.DATA_SUFFIXES[0] ));
 			if (dataProperties.isFile()){
 				Properties p = new Properties();
 				InputStream in = new FileInputStream(dataProperties);
@@ -62,7 +63,7 @@ public class DataAllocateHandler extends RequestHandler{
 				return  new Integer(p.getProperty(KEY_BLOCK));
 			}		
 		}
-		throw new JarachneException("file does not exists!");
+		throw new JarachneException("data does not exists!");
 	}
 
 	public String getPath() {
@@ -86,23 +87,22 @@ public class DataAllocateHandler extends RequestHandler{
 				int blocks = getNumbBlocks(dataName);
 				boolean[] sendOks= new boolean[blocks];
 				Array.setBoolean(sendOks, 0, false);
-				for(; tries < TRIES && allTrue(sendOks); tries++){
+				for(; tries < TRIES && !allTrue(sendOks); tries++){
 					System.out.println("try : " + tries);
 					for(int i = 0 ; i < blocks; i++){
 						int toSlavex = i % slaves.size();
 						if (sendOks[i] == true)
 							continue;
-						HttpPost[] postsOfBlock = setHttpPost("http:/" + slaves.get(toSlavex) + "/" + SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH, dataName, i);
+						HttpPost[] postsOfBlock = setHttpPost("http://" + slaves.get(toSlavex) + SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH, dataName, i);
 						boolean[] postResults = new boolean[postsOfBlock.length];
 						for(int j = 0 ; j < postsOfBlock.length; j ++){
 							try{
-								String result = this.fetchResult(client, postsOfBlock[j]);
-								if (result.equals(FileReceiveHandler.SUCCESS_STRING)){
+								String successFlag = this.fetchAllocateResult(client, postsOfBlock[j]);
+								if (successFlag.equals(FileReceiveHandler.SUCCESS_STRING)){
 									postResults[j] = true;
 									m.addMessageToJob(postsOfBlock[j].getURI() + "  finished!" );
 								}
 							}catch(Exception e){
-								//TODO
 								e.printStackTrace();
 							}
 						}
@@ -116,17 +116,15 @@ public class DataAllocateHandler extends RequestHandler{
 				long timeCost = System.currentTimeMillis() - t;
 				if (allTrue(sendOks) == false){
 					HttpResponseUtil.setResponse(resp, "distribute (" + dataName+ ") to slaves", 
-							" #tries reaches (" + TRIES + ") times, cost -> (" + timeCost +") ms.");
+							JsonStringUtil.JSONFormatString("finished",false, "time(ms)", timeCost));
 					resp.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 				}else{
 					HttpResponseUtil.setResponse(resp, "distribute (" + dataName+ ") to slaves", 
-							"data distributed! #tries -> (" + TRIES + ") times, cost -> (" + timeCost +") ms.");
+							JsonStringUtil.JSONFormatString("finished",true, "time(ms)", timeCost));
 
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-			}finally{
-				client.getConnectionManager().shutdown();
 			}
 		}
 	}
@@ -136,7 +134,7 @@ public class DataAllocateHandler extends RequestHandler{
 		for(int i = 0 ; i < Constants.BLOCK_SUFFIXES.length; i++){
 			HttpPost post = new HttpPost(URL);
 			post.addHeader(SentryConstants.HeaderKeys.DATANAME, dataName);
-			post.addHeader(SentryConstants.HeaderKeys.FILENAME, "/" + dataName + "/" + blockId + Constants.BLOCK_SUFFIXES[i]);
+			post.addHeader(SentryConstants.HeaderKeys.FILENAME, dataName + "/" + blockId + Constants.BLOCK_SUFFIXES[i]);
 			HttpParams params = post.getParams();
 			HttpConnectionParams.setConnectionTimeout(params,1000);
 			RandomAccessFile raf = new RandomAccessFile(String.format("%s/%s/%d%s", Constants.DATA_PATH, dataName, blockId, Constants.BLOCK_SUFFIXES[i]), "r");
@@ -150,21 +148,32 @@ public class DataAllocateHandler extends RequestHandler{
 		return httpPosts;
 	}
 
-	
-	private String fetchResult(HttpClient client, HttpUriRequest req ) throws InterruptedException, ExecutionException, TimeoutException{
+	/**
+	 * 
+	 * @param client
+	 * @param req
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 * @throws TimeoutException
+	 */
+	private String fetchAllocateResult(HttpClient client, HttpUriRequest req ) throws InterruptedException, ExecutionException, TimeoutException{
 		List<Callable<String >> distributedReqs = new ArrayList<Callable<String >> (1);
 		distributedReqs.add(new HttpRequestCallable(client, req));
 		List<String> results = ConcurrentExecutor.execute(distributedReqs, 2000);
-		return results.toString();
+		// {"host:port":"SUCCESS|ERROR"}
+		String response = HttpRequestCallable.summarizeResult(distributedReqs, results);
+		int idx1 = response.indexOf("\":\"");
+		return response.substring(idx1 + 3, response.length()-2);
 	}
 	
 	private boolean allTrue(boolean[] sendOks){
 		for(int i = 0; i < sendOks.length; i++){
 			if (sendOks[i] == false){
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 }

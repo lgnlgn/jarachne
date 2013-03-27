@@ -33,11 +33,19 @@ public class StatusHandler extends RequestHandler{
 	}
 
 	public void handle(NettyHttpRequest request, DefaultHttpResponse resp) {
-		JSONObject json = new JSONObject();
-		JSONArray ja = new JSONArray();
-		ja.addAll(((MasterModule)module).yieldSlaves());
-		json.put("live_slaves", ja);
-		HttpResponseUtil.setResponse(resp, "live nodes", json.toString());
+		String jobs = request.param("job"); //default 5
+		MasterModule m = ((MasterModule)module);
+		if (jobs != null){
+			int num = new Integer(jobs);
+			HttpResponseUtil.setResponse(resp, "latest jobs", m.getLatestJobStatus(num));
+		}else{
+			JSONObject json = new JSONObject();
+			JSONArray ja = new JSONArray();
+			ja.addAll(m.yieldSlaves());
+			json.put("live_slaves", ja);
+			json.put("running_job", m.getJobStatus());
+			HttpResponseUtil.setResponse(resp, "jarachne status", json.toString());
+		}
 	}
 
 }
