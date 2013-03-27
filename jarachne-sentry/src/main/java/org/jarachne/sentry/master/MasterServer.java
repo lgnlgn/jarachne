@@ -1,4 +1,4 @@
-package org.jarachne.sentry.core;
+package org.jarachne.sentry.master;
 
 
 
@@ -10,7 +10,6 @@ import org.jarachne.network.http.BaseChannelHandler;
 import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
-import org.jarachne.sentry.master.MasterModule;
 import org.jarachne.sentry.master.handler.DataAllocateHandler;
 import org.jarachne.sentry.master.handler.DataCollectHandler;
 import org.jarachne.sentry.master.handler.DataDisplayHandler;
@@ -30,7 +29,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 public class MasterServer extends BaseNioServer{
 
 	Handlers handlers = new Handlers();
-	final BaseChannelHandler channel = new BaseChannelHandler(handlers);
+	final BaseChannelHandler channel = new MasterChannelHandler(handlers);
 	
 	public String serverName() {
 		// TODO Auto-generated method stub

@@ -63,26 +63,26 @@ public class FileDistributeHandler extends RequestHandler{
 	
 	static ESLogger log = Loggers.getLogger(DataCollectHandler.class);
 	
-	static class FileSendChannelHandler extends AbstractDistributedChannelHandler{
-		MasterModule module;
-		@Override
-		public String requestSlaveUri() {
-			return SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH;
-		}
-
-		@Override
-		public AbstractDistributedChannelHandler clone(	Collection<String> currentSlaves) {
-			FileSendChannelHandler ch = new FileSendChannelHandler();
-			for(String slaveAddress: currentSlaves){
-				ch.callbacks.put(slaveAddress, "waiting");
-			}
-			return ch;
-		}
-		
-	}
+//	static class FileSendChannelHandler extends AbstractDistributedChannelHandler{
+//		MasterModule module;
+//		@Override
+//		public String requestSlaveUri() {
+//			return SentryConstants.Paths.SLAVE_RECIEVE_FILE_PATH;
+//		}
+//
+//		@Override
+//		public AbstractDistributedChannelHandler clone(	Collection<String> currentSlaves) {
+//			FileSendChannelHandler ch = new FileSendChannelHandler();
+//			for(String slaveAddress: currentSlaves){
+//				ch.callbacks.put(slaveAddress, "waiting");
+//			}
+//			return ch;
+//		}
+//		
+//	}
 	
 	public FileDistributeHandler(Module module) {
-		super(module, new FileSendChannelHandler());
+		super(module, null);
 	}
 	
 	public String getPath() {

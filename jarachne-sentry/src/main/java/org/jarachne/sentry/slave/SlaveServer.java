@@ -1,4 +1,4 @@
-package org.jarachne.sentry.core;
+package org.jarachne.sentry.slave;
 
 import org.apache.zookeeper.KeeperException;
 import org.jarachne.common.Constants;
@@ -6,7 +6,6 @@ import org.jarachne.network.http.BaseChannelHandler;
 import org.jarachne.network.http.BaseNioServer;
 import org.jarachne.network.http.Handler;
 import org.jarachne.network.http.Handlers;
-import org.jarachne.sentry.slave.SlaveModule;
 import org.jarachne.sentry.slave.handler.DataReportHandler;
 import org.jarachne.sentry.slave.handler.FileReceiveHandler;
 import org.jarachne.util.logging.Loggers;

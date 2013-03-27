@@ -1,4 +1,4 @@
-package org.jarachne.sentry.master;
+package org.jarachne.sentry.job;
 
 import net.sf.json.JSONObject;
 
@@ -7,7 +7,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.jarachne.common.Constants;
 
-import org.jarachne.sentry.job.AbstractJob;
 import org.jarachne.sentry.master.handler.DataAllocateHandler;
 import org.jarachne.sentry.master.handler.FileDistributeHandler;
 
@@ -35,7 +34,7 @@ public class DataDistributeJob extends AbstractJob{
 	}
 
 	public String getJobName() {
-		return this.getClass().getSimpleName();
+		return "Distribution of '" + dataName + "'";
 	}
 
 	public void releaseResource() {

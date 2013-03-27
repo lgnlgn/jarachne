@@ -2,7 +2,6 @@ package org.jarachne.sentry.master.handler;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
-import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,8 +9,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-
-import net.sf.json.JSONObject;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -28,7 +25,6 @@ import org.jarachne.util.concurrent.ConcurrentExecutor;
 import org.jarachne.util.logging.ESLogger;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -42,13 +38,14 @@ import org.jboss.netty.handler.codec.http.HttpRequestEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 
 public class DataCollectHandler extends RequestHandler{
 	static ESLogger log = Loggers.getLogger(DataCollectHandler.class);
 	
 	private String toSlavePath = SentryConstants.Paths.SLAVE_REPORT_DATA_PATH;
 	
+	public final static String PATH = "/data";
+	@Deprecated
 	static class DataCollectChannelHandler extends AbstractDistributedChannelHandler{
 		@Override
 		public String requestSlaveUri() {
@@ -68,12 +65,12 @@ public class DataCollectHandler extends RequestHandler{
 	
 	
 	public DataCollectHandler(MasterModule module) {
-		super(module, new DataCollectChannelHandler());
+		super(module, null);
 	}
 
 	public String getPath() {
-		// TODO Auto-generated method stub
-		return "/data";
+		
+		return PATH;
 	}
 
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {

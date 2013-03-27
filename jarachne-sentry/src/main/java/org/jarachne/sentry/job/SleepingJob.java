@@ -1,8 +1,7 @@
-package org.jarachne.sentry.master;
+package org.jarachne.sentry.job;
 
 import net.sf.json.JSONObject;
 
-import org.jarachne.sentry.job.AbstractJob;
 
 public class SleepingJob extends AbstractJob{
 

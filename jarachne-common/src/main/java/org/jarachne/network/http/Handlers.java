@@ -4,7 +4,11 @@
  */
 package org.jarachne.network.http;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jarachne.util.Strings;
 
@@ -27,6 +31,12 @@ public class Handlers {
 	
 	public Handler getHandler(String path) {
 		return  handlers.get(path);
+	}
+	
+	public Set<String> getHandlerPaths(){
+		Set<String> resultList = new HashSet<String>();
+		resultList.addAll(this.handlers.keySet());
+		return resultList;
 	}
 	
 

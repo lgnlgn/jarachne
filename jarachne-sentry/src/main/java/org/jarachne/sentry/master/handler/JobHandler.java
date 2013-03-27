@@ -12,9 +12,9 @@ import org.jarachne.sentry.core.Module;
 import org.jarachne.sentry.handler.AbstractDistributedChannelHandler;
 import org.jarachne.sentry.handler.RequestHandler;
 import org.jarachne.sentry.job.AbstractJob;
-import org.jarachne.sentry.master.DataDistributeJob;
+import org.jarachne.sentry.job.DataDistributeJob;
+import org.jarachne.sentry.job.SleepingJob;
 import org.jarachne.sentry.master.MasterModule;
-import org.jarachne.sentry.master.SleepingJob;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
@@ -26,6 +26,8 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
  */
 public class JobHandler extends RequestHandler{
 
+	public static final String PATH = "/job";
+	
 	public JobHandler(Module module) {
 		super(module, null);
 	}
@@ -36,8 +38,9 @@ public class JobHandler extends RequestHandler{
 		jobAllow.add("algorithm");
 		jobAllow.add("sleep");
 	}
+	
 	public String getPath() {
-		return "/job";
+		return PATH;
 	}
 
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {

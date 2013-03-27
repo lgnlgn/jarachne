@@ -13,13 +13,15 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
  */
 public class JobMessageFromSlaveHandler extends RequestHandler{
 	
+	public final static String PATH = "/slavereport";
+	
 	public JobMessageFromSlaveHandler(Module module) {
 		super(module, null);
 		
 	}
 
 	public String getPath() {
-		return "/slavereport";
+		return PATH;
 	}
 
 	public void handle(NettyHttpRequest req, DefaultHttpResponse resp) {
