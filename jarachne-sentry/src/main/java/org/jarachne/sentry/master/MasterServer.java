@@ -5,6 +5,7 @@ package org.jarachne.sentry.master;
 
 
 import org.apache.zookeeper.KeeperException;
+import org.jarachne.common.Config;
 import org.jarachne.common.Constants;
 import org.jarachne.network.http.BaseChannelHandler;
 import org.jarachne.network.http.BaseNioServer;
@@ -17,6 +18,7 @@ import org.jarachne.sentry.master.handler.FileDistributeHandler;
 import org.jarachne.sentry.master.handler.JobHandler;
 
 import org.jarachne.sentry.master.handler.StatusHandler;
+import org.jarachne.util.ZKServer;
 import org.jarachne.util.logging.Loggers;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -79,6 +81,13 @@ public class MasterServer extends BaseNioServer{
 	
 	
 	public static void main(String[] args) throws Exception {
+		
+		if (Config.get().getBoolean("zk.withmaster", false)){
+			Thread t = new Thread(new ZKServer());
+			t.setDaemon(true);
+			t.start();
+		}
+
 		MasterModule module = new MasterModule();
 		MasterServer mserver = new MasterServer();
 		mserver.addHandler(new DataDisplayHandler(module));
@@ -88,6 +97,7 @@ public class MasterServer extends BaseNioServer{
 		mserver.addHandler(new DataAllocateHandler(module));
 		mserver.addHandler(new JobHandler(module));
 		mserver.start();
+		
 		module.register(Constants.ZK_MASTER_PATH, mserver.getServerAddress());
 	}
 }

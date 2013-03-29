@@ -1,30 +1,35 @@
 package org.jarachne.util;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.zookeeper.server.NIOServerCnxn;
 import org.apache.zookeeper.server.ServerConfig;
-import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
 import org.jarachne.common.Config;
+import org.jarachne.common.Constants;
 
 public class ZKServer implements Runnable{
 	Properties startupProperties ;
-	public ZKServer(String path){
-		
+	public ZKServer(String path) throws IOException{
+		startupProperties = new Properties();
+		InputStream in = new FileInputStream(path);
+		startupProperties.load(in);
+		in.close();
 	}
 	
 	public ZKServer(){
-		
+		startupProperties = new Properties();
+		startupProperties.put("tickTime", Config.get().get("zk.tickTime", "2000"));
+		startupProperties.put("initLimit", Config.get().get("zk.initLimit", "10"));
+		startupProperties.put("syncLimit", Config.get().get("zk.syncLimit", "5"));
+		startupProperties.put("dataDir", Config.get().get("zk.dataDir", Constants.DATA_PATH));
+		startupProperties.put("clientPort", Config.get().get("zk.clientPort", "2181"));
 	}
 	
 	public void run() {
-		Properties startupProperties = new Properties();
-
 		QuorumPeerConfig quorumConfiguration = new QuorumPeerConfig();
 		try {
 			quorumConfiguration.parseProperties(startupProperties);
